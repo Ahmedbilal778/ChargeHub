@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="settings-page">
+
+    <!-- HEADER -->
+
+    <div class="settings-header">
+
+        <div>
+
+            <p class="settings-label">
+                ACCOUNT
+            </p>
+
+            <h2>
+                Settings
+            </h2>
+
+            <p class="settings-subtitle">
+                Manage your ChargeHub account and security preferences.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SETTINGS CARD -->
+
+    <div class="settings-card">
+
+        <!-- ACCOUNT -->
+
+        <div class="settings-section">
+
+            <div class="settings-section-title">
+
+                <i class="bi bi-person-circle"></i>
+
+                <div>
+                    <h3>Account</h3>
+
+                    <p>
+                        Manage your personal account information.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="settings-option-info">
+
+                    <div class="settings-option-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Profile
+                        </h4>
+
+                        <p>
+                            View and update your personal information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'profile' %}"
+                    class="settings-action"
+                >
+                    View Profile
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="settings-option-info">
+
+                    <div class="settings-option-icon">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Edit Profile
+                        </h4>
+
+                        <p>
+                            Change your name and email address.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'edit_profile' %}"
+                    class="settings-action"
+                >
+                    Edit
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- SECURITY -->
+
+        <div class="settings-section">
+
+            <div class="settings-section-title">
+
+                <i class="bi bi-shield-lock-fill"></i>
+
+                <div>
+
+                    <h3>
+                        Security
+                    </h3>
+
+                    <p>
+                        Protect your ChargeHub account.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="settings-option-info">
+
+                    <div class="settings-option-icon">
+                        <i class="bi bi-key-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Change Password
+                        </h4>
+
+                        <p>
+                            Update your account password.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'change_password' %}"
+                    class="settings-action"
+                >
+                    Change
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- SESSION -->
+
+        <div class="settings-section">
+
+            <div class="settings-section-title">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                <div>
+
+                    <h3>
+                        Session
+                    </h3>
+
+                    <p>
+                        Manage your current ChargeHub session.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-option">
+
+                <div class="settings-option-info">
+
+                    <div class="settings-option-icon">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Logout
+                        </h4>
+
+                        <p>
+                            Sign out of your ChargeHub account.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{% url 'logout' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="settings-logout-btn"
+                    >
+                        Logout
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

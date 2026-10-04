@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}My Vehicles - ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <p class="text-success fw-semibold small mb-1">
+                MY GARAGE
+            </p>
+
+            <h2 class="fw-bold mb-1">
+                My Vehicles
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage your EVs and charging preferences.
+            </p>
+        </div>
+
+
+        <!-- ADD VEHICLE -->
+
+        <a
+            href="{% url 'add_vehicle' %}"
+            class="btn btn-success"
+        >
+            <i class="bi bi-plus-lg me-1"></i>
+            Add Vehicle
+        </a>
+
+    </div>
+
+
+    {% if vehicles %}
+
+        <div class="row g-4">
+
+            {% for vehicle in vehicles %}
+
+            <div class="col-xl-4 col-md-6">
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body p-4">
+
+                        <!-- ================= TOP ================= -->
+
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+
+                            <div
+                                class="rounded-3 d-flex align-items-center justify-content-center"
+                                style="
+                                    width:58px;
+                                    height:58px;
+                                    background:#dcfce7;
+                                    color:#16a34a;
+                                    font-size:25px;
+                                "
+                            >
+
+                                {% if vehicle.vehicle_type == "CAR" %}
+
+                                    <i class="bi bi-car-front-fill"></i>
+
+                                {% elif vehicle.vehicle_type == "BIKE" %}
+
+                                    <i class="bi bi-bicycle"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-scooter"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if vehicle.is_primary %}
+
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
+
+                                    <i class="bi bi-star-fill me-1"></i>
+
+                                    Primary
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- ================= NAME ================= -->
+
+                        <h5 class="fw-bold mb-1">
+                            {{ vehicle.vehicle_name }}
+                        </h5>
+
+                        <p class="text-muted mb-4">
+                            {{ vehicle.vehicle_number }}
+                        </p>
+
+
+                        <!-- ================= DETAILS ================= -->
+
+                        <div class="row g-3">
+
+                            <!-- TYPE -->
+
+                            <div class="col-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Type
+                                    </small>
+
+                                    <strong>
+                                        {{ vehicle.get_vehicle_type_display }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- BATTERY -->
+
+                            <div class="col-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Battery
+                                    </small>
+
+                                    <strong>
+                                        {{ vehicle.battery_capacity }} kWh
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CURRENT -->
+
+                            <div class="col-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Current
+                                    </small>
+
+                                    <strong>
+                                        {{ vehicle.current_battery }}%
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RANGE -->
+
+                            <div class="col-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Range
+                                    </small>
+
+                                    <strong>
+                                        {{ vehicle.range_km }} km
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= BATTERY ================= -->
+
+                        <div class="mt-4">
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <small class="text-muted">
+                                    Battery Level
+                                </small>
+
+                                <small class="fw-semibold">
+                                    {{ vehicle.current_battery }}%
+                                </small>
+
+                            </div>
+
+
+                            <div
+                                class="progress"
+                                style="height:7px;"
+                            >
+
+                                <div
+                                    class="progress-bar bg-success"
+                                    role="progressbar"
+                                    style="width: {{ vehicle.current_battery }}%;"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= ACTIONS ================= -->
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <!-- EDIT -->
+
+                            <a
+                                href="{% url 'edit_vehicle' vehicle.id %}"
+                                class="btn btn-outline-secondary btn-sm flex-fill"
+                            >
+
+                                <i class="bi bi-pencil me-1"></i>
+
+                                Edit
+
+                            </a>
+
+
+                            <!-- DELETE -->
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm flex-fill"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ vehicle.id }}"
+                            >
+
+                                <i class="bi bi-trash me-1"></i>
+
+                                Delete
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- DELETE CONFIRMATION MODAL -->
+            <!-- ================================================= -->
+
+            <div
+                class="modal fade"
+                id="deleteModal{{ vehicle.id }}"
+                tabindex="-1"
+                aria-hidden="true"
+            >
+
+                <div class="modal-dialog modal-dialog-centered">
+
+                    <div class="modal-content border-0 shadow-lg">
+
+                        <div class="modal-body text-center p-4">
+
+                            <!-- WARNING ICON -->
+
+                            <div
+                                class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                                style="
+                                    width:64px;
+                                    height:64px;
+                                    background:#fee2e2;
+                                    color:#dc2626;
+                                    font-size:27px;
+                                "
+                            >
+
+                                <i class="bi bi-trash-fill"></i>
+
+                            </div>
+
+
+                            <h4 class="fw-bold mb-2">
+                                Delete Vehicle?
+                            </h4>
+
+
+                            <p class="text-muted mb-4">
+
+                                Are you sure you want to remove
+
+                                <strong>
+                                    {{ vehicle.vehicle_name }}
+                                </strong>
+
+                                from your vehicles?
+
+                            </p>
+
+
+                            <!-- VEHICLE INFO -->
+
+                            <div
+                                class="rounded-3 p-3 mb-4 text-start"
+                                style="background:#f8f9fa;"
+                            >
+
+                                <div class="d-flex justify-content-between mb-2">
+
+                                    <span class="text-muted">
+                                        Vehicle
+                                    </span>
+
+                                    <strong>
+                                        {{ vehicle.vehicle_name }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="d-flex justify-content-between">
+
+                                    <span class="text-muted">
+                                        Number
+                                    </span>
+
+                                    <strong>
+                                        {{ vehicle.vehicle_number }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- BUTTONS -->
+
+                            <div class="d-flex gap-2">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-light w-50"
+                                    data-bs-dismiss="modal"
+                                >
+                                    Keep Vehicle
+                                </button>
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'delete_vehicle' vehicle.id %}"
+                                    class="w-50"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger w-100"
+                                    >
+
+                                        <i class="bi bi-trash me-1"></i>
+
+                                        Yes, Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- ================= EMPTY STATE ================= -->
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <div
+                    class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style="
+                        width:75px;
+                        height:75px;
+                        background:#dcfce7;
+                        color:#16a34a;
+                        font-size:30px;
+                    "
+                >
+
+                    <i class="bi bi-car-front-fill"></i>
+
+                </div>
+
+
+                <h5 class="fw-bold">
+                    No Vehicles Added
+                </h5>
+
+
+                <p class="text-muted">
+                    Add your EV to make charging bookings easier.
+                </p>
+
+
+                <a
+                    href="{% url 'add_vehicle' %}"
+                    class="btn btn-success"
+                >
+
+                    <i class="bi bi-plus-lg me-1"></i>
+
+                    Add Your Vehicle
+
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

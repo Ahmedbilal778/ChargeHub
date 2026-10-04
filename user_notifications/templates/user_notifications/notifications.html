@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="notifications-page">
+
+    <!-- Header -->
+
+    <div class="notifications-header">
+
+        <div>
+            <p class="dashboard-label">
+                UPDATES
+            </p>
+
+            <h2>
+                Notifications
+            </h2>
+
+            <p class="notifications-subtitle">
+                Stay updated with your bookings, payments and charging activity.
+            </p>
+        </div>
+
+        {% if notifications %}
+
+        <a
+            href="{% url 'mark_all_notifications_read' %}"
+            class="mark-all-btn"
+        >
+            <i class="bi bi-check2-all"></i>
+            Mark all as read
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Notifications Card -->
+
+    <div class="notifications-card">
+
+        {% if notifications %}
+
+            {% for notification in notifications %}
+
+                <div class="notification-item
+                    {% if not notification.is_read %}
+                        unread
+                    {% endif %}
+                ">
+
+                    <!-- Icon -->
+
+                    <div class="notification-icon
+
+                        {% if notification.notification_type == 'BOOKING' %}
+                            booking
+                        {% elif notification.notification_type == 'PAYMENT' %}
+                            payment
+                        {% elif notification.notification_type == 'CHARGING' %}
+                            charging
+                        {% else %}
+                            system
+                        {% endif %}
+
+                    ">
+
+                        {% if notification.notification_type == "BOOKING" %}
+
+                            <i class="bi bi-calendar-check-fill"></i>
+
+                        {% elif notification.notification_type == "PAYMENT" %}
+
+                            <i class="bi bi-credit-card-fill"></i>
+
+                        {% elif notification.notification_type == "CHARGING" %}
+
+                            <i class="bi bi-lightning-charge-fill"></i>
+
+                        {% else %}
+
+                            <i class="bi bi-bell-fill"></i>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Content -->
+
+                    <div class="notification-content">
+
+                        <div class="notification-title-row">
+
+                            <h5>
+                                {{ notification.title }}
+                            </h5>
+
+                            {% if not notification.is_read %}
+
+                                <span class="new-badge">
+                                    New
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        <p>
+                            {{ notification.message }}
+                        </p>
+
+                        <span class="notification-time">
+
+                            <i class="bi bi-clock"></i>
+
+                            {{ notification.created_at|timesince }} ago
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Action -->
+
+                    {% if not notification.is_read %}
+
+                        <a
+                            href="{% url 'mark_notification_read' notification.id %}"
+                            class="notification-read-btn"
+                            title="Mark as read"
+                        >
+                            <i class="bi bi-check2"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <!-- Empty State -->
+
+            <div class="notifications-empty">
+
+                <div class="notifications-empty-icon">
+
+                    <i class="bi bi-bell-slash"></i>
+
+                </div>
+
+                <h4>
+                    No Notifications
+                </h4>
+
+                <p>
+                    You're all caught up. New updates will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

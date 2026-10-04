@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings - ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- PAGE HEADER -->
+    <div class="mb-4">
+        <p class="text-success fw-semibold small mb-1">
+            BOOKINGS
+        </p>
+
+        <h2 class="fw-bold mb-1">
+            My Bookings
+        </h2>
+
+        <p class="text-muted">
+            View and manage your EV charging bookings.
+        </p>
+    </div>
+
+
+    {% if bookings %}
+
+        <div class="row g-4">
+
+            {% for booking in bookings %}
+
+            <div class="col-12">
+
+                <div class="card border-0 shadow-sm booking-card">
+
+                    <div class="card-body p-4">
+
+                        <!-- TOP -->
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+
+                            <div class="d-flex align-items-center">
+
+                                <div
+                                    class="rounded-3 d-flex align-items-center justify-content-center me-3"
+                                    style="
+                                        width:52px;
+                                        height:52px;
+                                        background:#dcfce7;
+                                        color:#16a34a;
+                                        font-size:21px;
+                                    "
+                                >
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        {{ booking.station.name }}
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        Charger {{ booking.charger.charger_number }}
+                                        • {{ booking.charger.charger_type }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- STATUS -->
+
+                            {% if booking.status == "CONFIRMED" %}
+
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Confirmed
+                                </span>
+
+                            {% elif booking.status == "PENDING" %}
+
+                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Pending
+                                </span>
+
+                            {% elif booking.status == "COMPLETED" %}
+
+                                <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
+                                    <i class="bi bi-check-all me-1"></i>
+                                    Completed
+                                </span>
+
+                            {% elif booking.status == "CANCELLED" %}
+
+                                <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Cancelled
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- DETAILS -->
+
+                        <div class="row g-3">
+
+                            <!-- VEHICLE -->
+
+                            <div class="col-lg-3 col-md-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Vehicle
+                                    </small>
+
+                                    <strong>
+                                        {{ booking.vehicle.vehicle_name }}
+                                    </strong>
+
+                                    <small class="text-muted d-block">
+                                        {{ booking.vehicle.vehicle_number }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DATE -->
+
+                            <div class="col-lg-2 col-md-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Date
+                                    </small>
+
+                                    <strong>
+                                        {{ booking.booking_date }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- TIME -->
+
+                            <div class="col-lg-3 col-md-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Charging Time
+                                    </small>
+
+                                    <strong>
+                                        {{ booking.start_time }}
+                                        -
+                                        {{ booking.end_time }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- AMOUNT -->
+
+                            <div class="col-lg-2 col-md-6">
+
+                                <div class="p-3 rounded-3 bg-light">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Estimated Amount
+                                    </small>
+
+                                    <strong>
+                                        ₹{{ booking.estimated_amount }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTION -->
+
+                            <div class="col-lg-2 col-md-12">
+
+                                <div class="h-100 d-flex align-items-center justify-content-lg-end">
+
+                                    {% if booking.status != "CANCELLED" and booking.status != "COMPLETED" %}
+
+                                        <!-- CUSTOM MODAL BUTTON -->
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#cancelModal{{ booking.id }}"
+                                        >
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Cancel Booking
+                                        </button>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- BOOKING ID -->
+
+                        <div class="mt-4 pt-3 border-top">
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-receipt me-1"></i>
+
+                                Booking ID:
+
+                                <span class="fw-semibold">
+                                    {{ booking.booking_id }}
+                                </span>
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= CANCEL MODAL ================= -->
+
+            {% if booking.status != "CANCELLED" and booking.status != "COMPLETED" %}
+
+            <div
+                class="modal fade"
+                id="cancelModal{{ booking.id }}"
+                tabindex="-1"
+                aria-hidden="true"
+            >
+
+                <div class="modal-dialog modal-dialog-centered">
+
+                    <div class="modal-content border-0 shadow-lg">
+
+                        <div class="modal-body text-center p-4">
+
+                            <!-- ICON -->
+
+                            <div
+                                class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                                style="
+                                    width:64px;
+                                    height:64px;
+                                    background:#fee2e2;
+                                    color:#dc2626;
+                                    font-size:27px;
+                                "
+                            >
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+
+
+                            <h4 class="fw-bold mb-2">
+                                Cancel Booking?
+                            </h4>
+
+
+                            <p class="text-muted mb-4">
+
+                                Are you sure you want to cancel your booking at
+
+                                <strong>
+                                    {{ booking.station.name }}
+                                </strong>?
+
+                            </p>
+
+
+                            <!-- BOOKING INFO -->
+
+                            <div class="rounded-3 p-3 mb-4 text-start"
+                                 style="background:#f8f9fa;">
+
+                                <div class="d-flex justify-content-between mb-2">
+
+                                    <span class="text-muted">
+                                        Date
+                                    </span>
+
+                                    <strong>
+                                        {{ booking.booking_date }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="d-flex justify-content-between">
+
+                                    <span class="text-muted">
+                                        Time
+                                    </span>
+
+                                    <strong>
+                                        {{ booking.start_time }}
+                                        -
+                                        {{ booking.end_time }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="d-flex gap-2">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-light w-50"
+                                    data-bs-dismiss="modal"
+                                >
+                                    Keep Booking
+                                </button>
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'cancel_booking' booking.id %}"
+                                    class="w-50"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger w-100"
+                                    >
+                                        Yes, Cancel
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <div
+                    class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style="
+                        width:72px;
+                        height:72px;
+                        background:#dcfce7;
+                        color:#16a34a;
+                        font-size:28px;
+                    "
+                >
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+
+                <h5 class="fw-bold">
+                    No Bookings Yet
+                </h5>
+
+
+                <p class="text-muted">
+                    You haven't made any charging bookings yet.
+                </p>
+
+
+                <a
+                    href="{% url 'find_stations' %}"
+                    class="btn btn-success"
+                >
+                    <i class="bi bi-geo-alt me-1"></i>
+                    Find a Station
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

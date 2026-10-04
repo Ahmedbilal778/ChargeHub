@@ -1,0 +1,2407 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | ChargeHub{% endblock %}
+
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+/* =========================================================
+   EXISTING MAP CSS
+========================================================= */
+
+.dashboard-map {
+    width: 100%;
+    height: 340px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    background: #eef5ef;
+}
+
+.map-bottom-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 4px 0;
+}
+
+.map-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-info-item > i {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #ecfdf3;
+    color: #16a34a;
+}
+
+.map-info-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-info-item strong {
+    font-size: 15px;
+    color: #111827;
+}
+
+.map-info-item span {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.map-location-btn {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.map-location-btn:hover {
+    border-color: #16a34a;
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.chargehub-map-marker {
+    background: transparent;
+    border: none;
+}
+
+.map-marker-inner {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #16a34a;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+.user-location-marker {
+    background: transparent;
+    border: none;
+}
+
+.user-location-inner {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 4px solid #ffffff;
+    box-shadow:
+        0 0 0 5px rgba(37,99,235,0.25),
+        0 3px 10px rgba(0,0,0,0.25);
+}
+
+.station-popup {
+    min-width: 220px;
+}
+
+.station-popup h6 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.station-popup p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.station-popup p i {
+    margin-right: 4px;
+}
+
+.popup-available {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.popup-unavailable {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.map-charger-list {
+    margin-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+}
+
+.map-charger-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 11px;
+}
+
+.map-charger-row span {
+    color: #374151;
+}
+
+.map-charger-row strong {
+    color: #111827;
+}
+
+.map-charger-row em {
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.map-charger-row em.available {
+    color: #16a34a;
+}
+
+.map-charger-row em.occupied {
+    color: #dc2626;
+}
+
+.map-charger-row em.maintenance {
+    color: #d97706;
+}
+
+.map-charger-row em.offline {
+    color: #6b7280;
+}
+
+.map-no-chargers {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.map-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #16a34a;
+    color: #ffffff !important;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.map-view-btn:hover {
+    background: #15803d;
+    color: #ffffff !important;
+}
+
+.leaflet-container {
+    font-family: inherit;
+}
+
+.leaflet-control-attribution {
+    font-size: 9px;
+}
+
+.map-empty {
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8faf9;
+    border-radius: 14px;
+    color: #6b7280;
+}
+
+.map-empty i {
+    font-size: 34px;
+    color: #16a34a;
+    margin-bottom: 8px;
+}
+
+.map-empty strong {
+    font-size: 14px;
+    color: #374151;
+}
+
+.map-empty span {
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+@media (max-width: 768px) {
+
+    .dashboard-map {
+        height: 280px;
+    }
+
+    .map-bottom-info {
+        flex-wrap: wrap;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<div class="dashboard-hero">
+
+    <img
+        src="{% static 'images/hero-ev.png' %}"
+        alt="Electric Vehicle Charging"
+        class="hero-image"
+    >
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <span class="hero-badge">
+            Sustainable • Smart • Reliable
+        </span>
+
+        <h1>
+            Charge Today<br>
+            for a <span>Cleaner Tomorrow</span>
+        </h1>
+
+        <p>
+            Find, book, and charge with ease. Join the movement
+            towards a greener, smarter future.
+        </p>
+
+        <div class="hero-actions">
+
+            <a
+                href="{% url 'find_stations' %}"
+                class="hero-primary-btn"
+            >
+                Find Charging Stations
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+            <!-- WATCH VIDEO -->
+
+            <button
+                type="button"
+                class="hero-video-btn"
+                id="watchVideoBtn"
+            >
+                <i class="bi bi-play-circle"></i>
+                Watch Video
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     VIDEO MODAL
+========================================================= -->
+
+<div
+    class="ev-video-modal"
+    id="evVideoModal"
+>
+
+    <div class="ev-video-box">
+
+        <button
+            type="button"
+            class="ev-video-close"
+            id="closeVideoBtn"
+            aria-label="Close video"
+        >
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <video
+            id="evChargingVideo"
+            controls
+            playsinline
+            preload="metadata"
+        >
+            <source
+                src="{% static 'videos/ev_video.mp4' %}"
+                type="video/mp4"
+            >
+
+            Your browser does not support the video tag.
+
+        </video>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     DASHBOARD HEADER
+========================================================= -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <p class="dashboard-label">
+            OVERVIEW
+        </p>
+
+        <h2>
+            Dashboard
+        </h2>
+
+        <p class="dashboard-subtitle">
+            Manage your EV charging activity from one place.
+        </p>
+
+    </div>
+
+    <a
+        href="{% url 'find_stations' %}"
+        class="primary-btn"
+    >
+        <i class="bi bi-plus-lg"></i>
+        Book a Charger
+    </a>
+
+</div>
+
+
+
+<!-- =========================================================
+     STATS
+========================================================= -->
+
+<div class="stats-grid">
+
+
+    <!-- TOTAL CHARGING -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon green">
+            <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+
+        <div>
+
+            <span>
+                Total Charging
+            </span>
+
+            <h3>
+                124.8
+                <small>kWh</small>
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVE BOOKINGS -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon blue">
+            <i class="bi bi-calendar-check-fill"></i>
+        </div>
+
+        <div>
+
+            <span>
+                Active Bookings
+            </span>
+
+            <h3>
+                02
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL SPENT -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon orange">
+            <i class="bi bi-wallet2"></i>
+        </div>
+
+        <div>
+
+            <span>
+                Total Spent
+            </span>
+
+            <h3>
+                ₹2,486
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <!-- CO2 SAVED -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon purple">
+            <i class="bi bi-ev-front-fill"></i>
+        </div>
+
+        <div>
+
+            <span>
+                CO₂ Saved
+            </span>
+
+            <h3>
+                68.4
+                <small>kg</small>
+            </h3>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     MAIN DASHBOARD
+========================================================= -->
+
+<div class="dashboard-main-layout">
+
+
+    <!-- =====================================================
+         LEFT SIDE
+    ====================================================== -->
+
+    <div class="dashboard-left-column">
+
+
+        <!-- =================================================
+             MAP
+        ================================================== -->
+
+        <div class="dashboard-card map-card">
+
+            <div class="card-heading">
+
+                <div>
+
+                    <h5>
+                        Nearby Charging Stations
+                    </h5>
+
+                    <p>
+                        Find available chargers near you
+                    </p>
+
+                </div>
+
+                <a href="{% url 'find_stations' %}">
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            {% if stations %}
+
+                <div
+                    id="dashboardMap"
+                    class="dashboard-map"
+                ></div>
+
+
+                <div class="map-bottom-info">
+
+                    <div class="map-info-item">
+
+                        <i class="bi bi-geo-alt-fill"></i>
+
+                        <div>
+
+                            <strong id="stationCount">
+                                {{ stations|length }}
+                            </strong>
+
+                            <span>
+                                Stations Nearby
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="map-info-item">
+
+                        <i class="bi bi-lightning-charge-fill"></i>
+
+                        <div>
+
+                            <strong id="availableChargerCount">
+                                0
+                            </strong>
+
+                            <span>
+                                Available Chargers
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="map-location-btn"
+                        id="locateMeBtn"
+                    >
+
+                        <i class="bi bi-crosshair"></i>
+
+                        Use My Location
+
+                    </button>
+
+                </div>
+
+            {% else %}
+
+                <div class="map-empty">
+
+                    <i class="bi bi-geo-alt"></i>
+
+                    <strong>
+                        No Charging Stations Available
+                    </strong>
+
+                    <span>
+                        Add station coordinates from the admin panel.
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =================================================
+             CHARGING ACTIVITY
+        ================================================== -->
+
+        <div class="dashboard-card">
+
+            <div class="card-heading">
+
+                <div>
+
+                    <h5>
+                        Charging Activity
+                    </h5>
+
+                    <p>
+                        Your energy consumption
+                    </p>
+
+                </div>
+
+                <select class="period-select" id="chargingPeriod">
+
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="chart-placeholder">
+
+                <div class="chart-bars" id="chargingBars">
+
+                    <span style="height:35%;"></span>
+                    <span style="height:55%;"></span>
+                    <span style="height:42%;"></span>
+                    <span style="height:72%;"></span>
+                    <span style="height:48%;"></span>
+                    <span style="height:85%;"></span>
+                    <span style="height:62%;"></span>
+
+                </div>
+
+
+                <div class="chart-days" id="chargingDays">
+
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                    <span>Sun</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             RECENT CHARGING SESSIONS
+        ================================================== -->
+
+        <div class="dashboard-card recent-sessions-card">
+
+            <div class="card-heading recent-sessions-heading">
+
+                <div>
+                    <h5>Recent Charging Sessions</h5>
+                    <p>Your latest charging activity</p>
+                </div>
+
+                <a href="{% url 'charging_history' %}">
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+            <div class="recent-sessions-list">
+
+                <div class="recent-session-row">
+                    <div class="session-station-icon green">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <div class="session-main">
+                        <strong>GreenVolt Charging Hub</strong>
+                        <span>Vijay Nagar, Indore • 30 Sep 2026</span>
+                    </div>
+                    <div class="session-energy">
+                        <strong>18.4 kWh</strong>
+                        <span>1h 05m</span>
+                    </div>
+                    <div class="session-amount">
+                        <strong>₹320</strong>
+                        <span class="session-status completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="recent-session-row">
+                    <div class="session-station-icon blue">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <div class="session-main">
+                        <strong>EcoCharge Station</strong>
+                        <span>Palasia, Indore • 27 Sep 2026</span>
+                    </div>
+                    <div class="session-energy">
+                        <strong>14.8 kWh</strong>
+                        <span>52 min</span>
+                    </div>
+                    <div class="session-amount">
+                        <strong>₹270</strong>
+                        <span class="session-status completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="recent-session-row">
+                    <div class="session-station-icon purple">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <div class="session-main">
+                        <strong>GreenVolt Charging Hub</strong>
+                        <span>Vijay Nagar, Indore • 24 Sep 2026</span>
+                    </div>
+                    <div class="session-energy">
+                        <strong>22.6 kWh</strong>
+                        <span>1h 18m</span>
+                    </div>
+                    <div class="session-amount">
+                        <strong>₹410</strong>
+                        <span class="session-status completed">Completed</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MONTHLY GOAL + ENVIRONMENTAL IMPACT
+        ================================================== -->
+
+        <div class="dashboard-mini-grid">
+
+            <div class="dashboard-card mini-dashboard-card charging-goal-card">
+
+                <div class="mini-card-heading">
+                    <div class="mini-card-icon green">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+                    <div>
+                        <span>MONTHLY GOAL</span>
+                        <h5>Charging Goal</h5>
+                    </div>
+                </div>
+
+                <div class="goal-content">
+                    <div class="goal-ring" style="--goal-progress: 62%;">
+                        <div>
+                            <strong>62%</strong>
+                            <span>Complete</span>
+                        </div>
+                    </div>
+                    <div class="goal-details">
+                        <strong>124.8 / 200 kWh</strong>
+                        <span>Keep charging smart this month.</span>
+                        <div class="goal-progress-bar">
+                            <span style="width: 62%;"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card mini-dashboard-card impact-card">
+
+                <div class="mini-card-heading">
+                    <div class="mini-card-icon purple">
+    <svg
+        class="impact-leaf-svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            d="M20.5 3.5C12.5 3.5 5.5 6.5 4 13c-.7 3.1 1.1 6.2 4.2 6.2
+            4.8 0 8.2-5.1 8.8-9.4"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        />
+        <path
+            d="M4.5 19.5c2.4-3.8 5.5-6.2 10.2-8.1"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+        />
+    </svg>
+</div>
+                    <div>
+                        <span>YOUR IMPACT</span>
+                        <h5>Environmental Impact</h5>
+                    </div>
+                </div>
+
+                <div class="impact-grid">
+                    <div class="impact-item">
+                        <strong>68.4 kg</strong>
+                        <span>CO₂ Saved</span>
+                    </div>
+                    <div class="impact-item">
+                        <strong>496 km</strong>
+                        <span>Green Miles</span>
+                    </div>
+                    <div class="impact-item">
+                        <strong>7.8 kg</strong>
+                        <span>Fuel Avoided</span>
+                    </div>
+                </div>
+
+                <div class="impact-message">
+                    <i class="bi bi-stars"></i>
+                    Every charge makes a difference.
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RIGHT SIDE
+    ====================================================== -->
+
+    <div class="dashboard-right-column">
+
+
+        <!-- =================================================
+             MY VEHICLE
+        ================================================== -->
+
+        <div class="dashboard-card side-dashboard-card">
+
+            <div class="side-card-header">
+
+                <div>
+
+                    <span class="side-card-label">
+                        MY VEHICLE
+                    </span>
+
+                    <h5>
+                        Your Vehicle
+                    </h5>
+
+                </div>
+
+            </div>
+
+
+            <div class="vehicle-preview">
+
+                <div class="vehicle-icon-box">
+
+                    <i class="bi bi-car-front-fill"></i>
+
+                </div>
+
+                <div class="vehicle-info">
+
+                    <strong>
+                        My Electric Vehicle
+                    </strong>
+
+                    <span>
+                        Ready for your next charge
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="vehicle-mini-stats">
+
+                <div>
+
+                    <span>
+                        Battery
+                    </span>
+
+                    <strong>
+                        78%
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Range
+                    </span>
+
+                    <strong>
+                        320 km
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+        ================================================== -->
+
+        <div class="dashboard-card side-dashboard-card">
+
+            <div class="side-card-header">
+
+                <div>
+
+                    <span class="side-card-label">
+                        SHORTCUTS
+                    </span>
+
+                    <h5>
+                        Quick Actions
+                    </h5>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+                <a
+                    href="{% url 'find_stations' %}"
+                    class="quick-action-item"
+                >
+
+                    <span class="quick-action-icon green">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+
+                    <span>
+                        Find Station
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{% url 'find_stations' %}"
+                    class="quick-action-item"
+                >
+
+                    <span class="quick-action-icon blue">
+                        <i class="bi bi-calendar-plus"></i>
+                    </span>
+
+                    <span>
+                        Book Charger
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="#"
+                    class="quick-action-item"
+                >
+
+                    <span class="quick-action-icon orange">
+                        <i class="bi bi-car-front-fill"></i>
+                    </span>
+
+                    <span>
+                        My Vehicle
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{% url 'payments' %}"
+                    class="quick-action-item"
+                >
+
+                    <span class="quick-action-icon purple">
+                        <i class="bi bi-credit-card-fill"></i>
+                    </span>
+
+                    <span>
+                        Payments
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             NEXT BOOKING
+        ================================================== -->
+
+        <div class="dashboard-card side-dashboard-card">
+
+            <div class="side-card-header">
+
+                <div>
+
+                    <span class="side-card-label">
+                        UPCOMING
+                    </span>
+
+                    <h5>
+                        Next Booking
+                    </h5>
+
+                </div>
+
+                <a
+                    href="{% url 'my_bookings' %}"
+                    class="side-view-link"
+                >
+                    View All
+                </a>
+
+            </div>
+
+
+            {% if next_booking %}
+
+                <div class="side-booking">
+
+                    <div class="side-booking-icon">
+
+                        <i class="bi bi-lightning-charge-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            {{ next_booking.station.name }}
+                        </strong>
+
+                        <span>
+                            <i class="bi bi-geo-alt"></i>
+                            {{ next_booking.station.city }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="side-booking-details">
+
+                    <div>
+
+                        <span>
+                            Date
+                        </span>
+
+                        <strong>
+                            {{ next_booking.booking_date|date:"d M Y" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Time
+                        </span>
+
+                        <strong>
+                            {{ next_booking.start_time|time:"g:i A" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'my_bookings' %}"
+                    class="side-outline-btn"
+                >
+                    View Booking
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            {% else %}
+
+                <div class="no-booking">
+
+                    <i class="bi bi-calendar-x"></i>
+
+                    <strong>
+                        No Upcoming Booking
+                    </strong>
+
+                    <span>
+                        Book a charger for your next session.
+                    </span>
+
+                </div>
+
+
+                <a
+                    href="{% url 'find_stations' %}"
+                    class="side-outline-btn"
+                >
+                    Book a Charger
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =================================================
+     AI CHARGING INSIGHT
+================================================== -->
+
+<div class="dashboard-card side-dashboard-card ai-side-card">
+
+    <div class="ai-side-heading">
+
+        <div class="ai-side-icon">
+
+            <i class="bi bi-stars"></i>
+
+        </div>
+
+        <div>
+
+            <span class="side-card-label">
+                SMART RECOMMENDATION
+            </span>
+
+            <h5>
+                AI Charging Insight
+            </h5>
+
+        </div>
+
+    </div>
+
+
+    <div class="ai-side-message">
+
+        <i class="bi bi-lightbulb-fill"></i>
+
+        <p>
+
+            Get personalized charging recommendations
+            based on your vehicle and charging activity.
+
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         VIEW AI INSIGHTS BUTTON
+    ================================================== -->
+
+    <a
+        href="{% url 'charging_insights' %}"
+        class="ai-side-btn"
+    >
+
+        View AI Insights
+
+        <i class="bi bi-arrow-right"></i>
+
+    </a>
+
+</div>
+
+        <!-- =================================================
+             RECENT ACTIVITY
+        ================================================== -->
+
+        <div class="dashboard-card side-dashboard-card">
+
+            <div class="side-card-header">
+
+                <div>
+
+                    <span class="side-card-label">
+                        ACTIVITY
+                    </span>
+
+                    <h5>
+                        Recent Activity
+                    </h5>
+
+                </div>
+
+                <a
+                    href="{% url 'charging_history' %}"
+                    class="side-view-link"
+                >
+                    View All
+                </a>
+
+            </div>
+
+
+            <div class="recent-activity">
+
+
+                <div class="recent-item">
+
+                    <div class="recent-icon green">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Charging Activity
+                        </strong>
+
+                        <span>
+                            Your charging history
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recent-item">
+
+                    <div class="recent-icon blue">
+                        <i class="bi bi-credit-card-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Payments
+                        </strong>
+
+                        <span>
+                            Manage your transactions
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recent-item">
+
+                    <div class="recent-icon purple">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Bookings
+                        </strong>
+
+                        <span>
+                            View your charging bookings
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             GREEN MESSAGE
+        ================================================== -->
+
+        <div class="dashboard-green-message">
+
+            <div class="green-message-icon">
+
+                  <span class="leaf-symbol">🍃</span>
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Small Charge. Big Change.
+                </strong>
+
+                <span>
+                    Every charge helps build a cleaner,
+                    greener future.
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+
+<!-- =========================================================
+     EXTRA JS
+========================================================= -->
+
+{% block extra_js %}
+
+<!-- =========================================================
+     LEAFLET JS
+========================================================= -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           MAP ELEMENT
+        ================================================= */
+
+        const mapElement =
+            document.getElementById(
+                "dashboardMap"
+            );
+
+
+        if (!mapElement) {
+            return;
+        }
+
+
+
+        /* =================================================
+           STATION DATA FROM DJANGO
+        ================================================= */
+
+        const stations = [
+
+            {% for station in stations %}
+
+            {
+
+                id:
+                    {{ station.id }},
+
+                name:
+                    "{{ station.name|escapejs }}",
+
+                address:
+                    "{{ station.address|escapejs }}",
+
+                city:
+                    "{{ station.city|escapejs }}",
+
+                latitude:
+                    Number("{{ station.latitude }}"),
+
+                longitude:
+                    Number("{{ station.longitude }}"),
+
+                openingTime:
+                    "{{ station.opening_time|time:'g:i A' }}",
+
+                closingTime:
+                    "{{ station.closing_time|time:'g:i A' }}",
+
+                chargers: [
+
+                    {% for charger in station.chargers.all %}
+
+                    {
+
+                        type:
+                            "{{ charger.get_charger_type_display|escapejs }}",
+
+                        power:
+                            "{{ charger.power_kw }}",
+
+                        price:
+                            "{{ charger.price_per_kwh }}",
+
+                        status:
+                            "{{ charger.status|escapejs }}"
+
+                    }
+
+                    {% if not forloop.last %},{% endif %}
+
+                    {% endfor %}
+
+                ]
+
+            }
+
+            {% if not forloop.last %},{% endif %}
+
+            {% endfor %}
+
+        ];
+
+
+
+        /* =================================================
+           DEFAULT LOCATION - INDORE
+        ================================================= */
+
+        const defaultLocation = [
+            22.7196,
+            75.8577
+        ];
+
+
+
+        /* =================================================
+           CREATE MAP
+        ================================================= */
+
+        const map =
+            L.map(
+                "dashboardMap",
+                {
+                    zoomControl: true
+                }
+            ).setView(
+                defaultLocation,
+                12
+            );
+
+
+
+        /* =================================================
+           MAP TILE
+        ================================================= */
+
+        L.tileLayer(
+
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+
+            {
+
+                maxZoom: 19,
+
+                attribution:""
+            
+
+            }
+
+        ).addTo(map);
+
+
+
+        /* =================================================
+           STATION ICON
+        ================================================= */
+
+        const stationIcon =
+
+            L.divIcon({
+
+                className:
+                    "chargehub-map-marker",
+
+                html:
+
+                    `
+                    <div class="map-marker-inner">
+
+                        <i class="bi bi-lightning-charge-fill"></i>
+
+                    </div>
+                    `,
+
+                iconSize: [
+                    42,
+                    42
+                ],
+
+                iconAnchor: [
+                    21,
+                    21
+                ],
+
+                popupAnchor: [
+                    0,
+                    -20
+                ]
+
+            });
+
+
+
+        /* =================================================
+           ADD STATION MARKERS
+        ================================================= */
+
+        const markerBounds = [];
+
+        let availableChargers = 0;
+
+
+        stations.forEach(
+
+            function (station) {
+
+
+                /* -----------------------------------------
+                   CHECK COORDINATES
+                ----------------------------------------- */
+
+                if (
+                    Number.isNaN(station.latitude) ||
+                    Number.isNaN(station.longitude)
+                ) {
+                    return;
+                }
+
+
+
+                /* -----------------------------------------
+                   AVAILABLE CHARGERS
+                ----------------------------------------- */
+
+                const available =
+
+                    station.chargers.filter(
+
+                        function (charger) {
+
+                            return (
+                                charger.status ===
+                                "AVAILABLE"
+                            );
+
+                        }
+
+                    ).length;
+
+
+                availableChargers +=
+                    available;
+
+
+
+                /* -----------------------------------------
+                   CHARGER LIST
+                ----------------------------------------- */
+
+                let chargerHTML = "";
+
+
+                if (
+                    station.chargers.length > 0
+                ) {
+
+                    chargerHTML =
+
+                        station.chargers.map(
+
+                            function (charger) {
+
+                                const statusClass =
+                                    charger.status
+                                    .toLowerCase();
+
+                                return `
+
+                                    <div
+                                        class="map-charger-row"
+                                    >
+
+                                        <span>
+                                            ${charger.type}
+                                        </span>
+
+                                        <strong>
+                                            ${charger.power} kW
+                                        </strong>
+
+                                        <em
+                                            class="${statusClass}"
+                                        >
+                                            ${charger.status}
+                                        </em>
+
+                                    </div>
+
+                                `;
+
+                            }
+
+                        ).join("");
+
+                }
+
+                else {
+
+                    chargerHTML = `
+
+                        <p class="map-no-chargers">
+                            No chargers available
+                        </p>
+
+                    `;
+
+                }
+
+
+
+                /* -----------------------------------------
+                   STATION URL
+                ----------------------------------------- */
+
+                const stationURL =
+
+                    "{% url 'station_detail' 0 %}"
+
+                    .replace(
+                        "/0/",
+                        "/" +
+                        station.id +
+                        "/"
+                    );
+
+
+
+                /* -----------------------------------------
+                   AVAILABILITY
+                ----------------------------------------- */
+
+                const availabilityHTML =
+
+                    available > 0
+
+                    ?
+
+                    `
+
+                    <span class="popup-available">
+
+                        ${available}
+                        charger(s) available
+
+                    </span>
+
+                    `
+
+                    :
+
+                    `
+
+                    <span class="popup-unavailable">
+
+                        No charger currently available
+
+                    </span>
+
+                    `;
+
+
+
+                /* -----------------------------------------
+                   POPUP
+                ----------------------------------------- */
+
+                const popupHTML = `
+
+                    <div class="station-popup">
+
+                        <h6>
+                            ${station.name}
+                        </h6>
+
+
+                        <p>
+
+                            <i
+                                class="bi bi-geo-alt-fill"
+                            ></i>
+
+                            ${station.address},
+                            ${station.city}
+
+                        </p>
+
+
+                        <p>
+
+                            <i
+                                class="bi bi-clock"
+                            ></i>
+
+                            ${station.openingTime}
+                            -
+                            ${station.closingTime}
+
+                        </p>
+
+
+                        <p>
+                            ${availabilityHTML}
+                        </p>
+
+
+                        <div
+                            class="map-charger-list"
+                        >
+
+                            ${chargerHTML}
+
+                        </div>
+
+
+                        <a
+                            href="${stationURL}"
+                            class="map-view-btn"
+                        >
+
+                            View Station
+
+                            <i
+                                class="bi bi-arrow-right"
+                            ></i>
+
+                        </a>
+
+                    </div>
+
+                `;
+
+
+
+                /* -----------------------------------------
+                   MARKER
+                ----------------------------------------- */
+
+                const marker =
+
+                    L.marker(
+
+                        [
+                            station.latitude,
+                            station.longitude
+                        ],
+
+                        {
+                            icon:
+                                stationIcon
+                        }
+
+                    )
+
+                    .addTo(map);
+
+
+                marker.bindPopup(
+                    popupHTML
+                );
+
+
+                markerBounds.push(
+
+                    [
+                        station.latitude,
+                        station.longitude
+                    ]
+
+                );
+
+            }
+
+        );
+
+
+
+        /* =================================================
+           AVAILABLE CHARGER COUNT
+        ================================================= */
+
+        const chargerCountElement =
+
+            document.getElementById(
+                "availableChargerCount"
+            );
+
+
+        if (chargerCountElement) {
+
+            chargerCountElement.textContent =
+                availableChargers;
+
+        }
+
+
+
+        /* =================================================
+           SMART MAP ZOOM
+           
+           1 STATION  -> NORMAL ZOOM
+           MULTIPLE   -> FIT ALL STATIONS
+        ================================================= */
+
+        if (
+            markerBounds.length === 1
+        ) {
+
+            /* ---------------------------------------------
+               SINGLE STATION
+               Don't zoom too close
+            --------------------------------------------- */
+
+            map.setView(
+
+                markerBounds[0],
+
+                14
+
+            );
+
+        }
+
+
+        else if (
+            markerBounds.length > 1
+        ) {
+
+            /* ---------------------------------------------
+               MULTIPLE STATIONS
+            --------------------------------------------- */
+
+            const bounds =
+                L.latLngBounds(
+                    markerBounds
+                );
+
+
+            map.fitBounds(
+
+                bounds,
+
+                {
+                    padding: [
+                        40,
+                        40
+                    ],
+
+                    /* Prevent excessive zoom */
+                    maxZoom: 14
+
+                }
+
+            );
+
+        }
+
+
+        else {
+
+            /* ---------------------------------------------
+               NO VALID COORDINATES
+            --------------------------------------------- */
+
+            map.setView(
+                defaultLocation,
+                12
+            );
+
+        }
+
+
+
+        /* =================================================
+           USER LOCATION
+        ================================================= */
+
+        const locateButton =
+
+            document.getElementById(
+                "locateMeBtn"
+            );
+
+
+        let userMarker = null;
+
+
+        if (locateButton) {
+
+
+            locateButton.addEventListener(
+
+                "click",
+
+                function () {
+
+
+                    if (
+                        !navigator.geolocation
+                    ) {
+
+                        alert(
+                            "Geolocation is not supported by your browser."
+                        );
+
+                        return;
+
+                    }
+
+
+
+                    locateButton.innerHTML = `
+
+                        <i
+                            class="bi bi-hourglass-split"
+                        ></i>
+
+                        Locating...
+
+                    `;
+
+
+
+                    navigator.geolocation.getCurrentPosition(
+
+                        function (position) {
+
+
+                            const latitude =
+                                position.coords.latitude;
+
+
+                            const longitude =
+                                position.coords.longitude;
+
+
+
+                            /* REMOVE OLD MARKER */
+
+                            if (userMarker) {
+
+                                map.removeLayer(
+                                    userMarker
+                                );
+
+                            }
+
+
+
+                            /* USER ICON */
+
+                            const userIcon =
+
+                                L.divIcon({
+
+                                    className:
+                                        "user-location-marker",
+
+                                    html:
+
+                                        `
+
+                                        <div
+                                            class="user-location-inner"
+                                        ></div>
+
+                                        `,
+
+                                    iconSize: [
+                                        18,
+                                        18
+                                    ],
+
+                                    iconAnchor: [
+                                        9,
+                                        9
+                                    ]
+
+                                });
+
+
+
+                            /* USER MARKER */
+
+                            userMarker =
+
+                                L.marker(
+
+                                    [
+                                        latitude,
+                                        longitude
+                                    ],
+
+                                    {
+                                        icon:
+                                            userIcon
+                                    }
+
+                                )
+
+                                .addTo(map);
+
+
+
+                            userMarker.bindPopup(
+
+                                `
+                                <strong>
+                                    Your Location
+                                </strong>
+                                `
+
+                            ).openPopup();
+
+
+
+                            /* MOVE MAP */
+
+                            map.setView(
+
+                                [
+                                    latitude,
+                                    longitude
+                                ],
+
+                                14
+
+                            );
+
+
+                            locateButton.innerHTML = `
+
+                                <i
+                                    class="bi bi-check-circle"
+                                ></i>
+
+                                Location Found
+
+                            `;
+
+
+                        },
+
+
+                        function () {
+
+
+                            alert(
+                                "Unable to access your location. Please allow location permission."
+                            );
+
+
+                            locateButton.innerHTML = `
+
+                                <i
+                                    class="bi bi-crosshair"
+                                ></i>
+
+                                Use My Location
+
+                            `;
+
+                        },
+
+
+                        {
+
+                            enableHighAccuracy:
+                                true,
+
+                            timeout:
+                                10000,
+
+                            maximumAge:
+                                0
+
+                        }
+
+                    );
+
+                }
+
+            );
+
+        }
+
+
+
+        /* =================================================
+           FIX MAP SIZE
+        ================================================= */
+
+        setTimeout(
+
+            function () {
+
+                map.invalidateSize();
+
+            },
+
+            300
+
+        );
+
+    }
+
+);
+
+
+
+/* =========================================================
+   CHARGING ACTIVITY - DYNAMIC DEMO DATA
+========================================================= */
+
+const chargingPeriod =
+    document.getElementById(
+        "chargingPeriod"
+    );
+
+const chargingBars =
+    document.getElementById(
+        "chargingBars"
+    );
+
+const chargingDays =
+    document.getElementById(
+        "chargingDays"
+    );
+
+
+if (
+    chargingPeriod &&
+    chargingBars &&
+    chargingDays
+) {
+
+
+    const chargingData = {
+
+        week: {
+
+            labels: [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+
+            values: [
+                35,
+                55,
+                42,
+                72,
+                48,
+                85,
+                62
+            ]
+
+        },
+
+
+        month: {
+
+            labels: [
+                "Week 1",
+                "Week 2",
+                "Week 3",
+                "Week 4"
+            ],
+
+            values: [
+                48,
+                72,
+                58,
+                88
+            ]
+
+        },
+
+
+        year: {
+
+            labels: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+            ],
+
+            values: [
+                38,
+                52,
+                46,
+                68,
+                74,
+                58,
+                82,
+                65,
+                91,
+                76,
+                87,
+                70
+            ]
+
+        }
+
+    };
+
+
+
+    function updateChargingChart(period) {
+
+
+        const data =
+            chargingData[period];
+
+
+        if (!data) {
+            return;
+        }
+
+
+        chargingBars.innerHTML =
+            "";
+
+        chargingDays.innerHTML =
+            "";
+
+
+
+        data.values.forEach(
+
+            function (value) {
+
+                const bar =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                bar.style.height =
+                    value + "%";
+
+
+                chargingBars.appendChild(
+                    bar
+                );
+
+            }
+
+        );
+
+
+
+        data.labels.forEach(
+
+            function (label) {
+
+                const day =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                day.textContent =
+                    label;
+
+
+                chargingDays.appendChild(
+                    day
+                );
+
+            }
+
+        );
+
+    }
+
+
+
+    chargingPeriod.addEventListener(
+
+        "change",
+
+        function () {
+
+            updateChargingChart(
+                this.value
+            );
+
+        }
+
+    );
+
+
+    updateChargingChart(
+        "week"
+    );
+
+}
+
+</script>
+
+{% endblock %}

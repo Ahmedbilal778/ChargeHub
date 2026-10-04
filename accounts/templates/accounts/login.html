@@ -1,0 +1,207 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login | ChargeHub</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/auth.css' %}"
+    >
+
+</head>
+
+<body class="auth-body">
+
+<div class="auth-wrapper">
+
+    <div class="auth-container">
+
+        <!-- LEFT -->
+        <div class="auth-brand">
+
+            <div class="auth-logo">
+
+                <div class="auth-logo-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+
+                <div>
+                    <h2>ChargeHub</h2>
+                    <span>Smart EV Charging</span>
+                </div>
+
+            </div>
+
+
+            <div class="auth-brand-content">
+
+                <h1>
+                    Power your journey.
+                    <br>
+                    Charge smarter.
+                </h1>
+
+                <p>
+                    Find nearby charging stations, manage your
+                    bookings and keep your EV ready for the road.
+                </p>
+
+
+                <div class="auth-feature">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>Find charging stations easily</span>
+                </div>
+
+                <div class="auth-feature">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Book your charging slot</span>
+                </div>
+
+                <div class="auth-feature">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span>Track your charging history</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+        <div class="auth-form-section">
+
+            <div class="auth-form">
+
+                <div class="auth-form-header">
+
+                    <h1>Welcome back</h1>
+
+                    <p>
+                        Sign in to continue to your ChargeHub account.
+                    </p>
+
+                </div>
+
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                        <div class="auth-alert">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <input
+                        type="hidden"
+                        name="next"
+                        value="{{ request.GET.next }}"
+                    >
+
+
+                    <div class="auth-field">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <div class="auth-input-wrapper">
+
+                            <i class="bi bi-person"></i>
+
+                            <input
+                                type="text"
+                                name="username"
+                                class="auth-input"
+                                placeholder="Enter your username"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="auth-field">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <div class="auth-input-wrapper">
+
+                            <i class="bi bi-lock"></i>
+
+                            <input
+                                type="password"
+                                name="password"
+                                class="auth-input"
+                                placeholder="Enter your password"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        Sign In
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+
+                </form>
+
+
+                <div class="auth-footer">
+
+                    Don't have an account?
+
+                    <a href="{% url 'register' %}">
+                        Create one
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

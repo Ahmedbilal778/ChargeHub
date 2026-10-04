@@ -1,0 +1,871 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ station.name }} | ChargeHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="station-detail-page">
+
+    <!-- =========================================
+         BACK TO STATIONS
+    ========================================== -->
+
+    <a
+        href="{% url 'find_stations' %}"
+        class="station-back-link"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Stations
+    </a>
+
+
+    <!-- =========================================
+         STATION HEADER
+    ========================================== -->
+
+    <div class="station-detail-header">
+
+        <div class="station-detail-title">
+
+            <div class="station-detail-icon">
+                <i class="bi bi-ev-front-fill"></i>
+            </div>
+
+            <div>
+
+                <p class="dashboard-label">
+                    CHARGING STATION
+                </p>
+
+                <h2>
+                    {{ station.name }}
+                </h2>
+
+                <p class="station-detail-location">
+
+                    <i class="bi bi-geo-alt-fill"></i>
+
+                    {{ station.address }},
+                    {{ station.city }},
+                    {{ station.state }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if station.is_active %}
+
+            <div class="station-active-badge">
+                <span></span>
+                Active
+            </div>
+
+        {% else %}
+
+            <div class="station-active-badge inactive">
+                <span></span>
+                Inactive
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================================
+         STATION INFORMATION
+    ========================================== -->
+
+    <div class="station-info-grid">
+
+
+        <!-- Opening Hours -->
+
+        <div class="station-info-card">
+
+            <div class="station-info-icon">
+                <i class="bi bi-clock"></i>
+            </div>
+
+            <div>
+
+                <span>
+                    Opening Hours
+                </span>
+
+                <strong>
+                    {{ station.opening_time|time:"g:i A" }}
+                    -
+                    {{ station.closing_time|time:"g:i A" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Chargers -->
+
+        <div class="station-info-card">
+
+            <div class="station-info-icon">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+
+            <div>
+
+                <span>
+                    Total Chargers
+                </span>
+
+                <strong>
+                    {{ station.chargers.all|length }}
+                    Chargers
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Location -->
+
+        <div class="station-info-card">
+
+            <div class="station-info-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+
+            <div>
+
+                <span>
+                    Location
+                </span>
+
+                <strong>
+                    {{ station.city }},
+                    {{ station.state }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         CHARGERS SECTION
+    ========================================== -->
+
+    <div class="station-chargers-section">
+
+
+        <!-- Section Header -->
+
+        <div class="station-section-header">
+
+            <div>
+
+                <h4>
+                    Available Chargers
+                </h4>
+
+                <p>
+                    Select an available charger to make a booking.
+                </p>
+
+            </div>
+
+            <span class="charger-count">
+                {{ station.chargers.all|length }}
+                Chargers
+            </span>
+
+        </div>
+
+
+        <!-- =====================================
+             CHARGER LIST
+        ====================================== -->
+
+        <div class="detail-charger-list">
+
+
+            {% for charger in station.chargers.all %}
+
+
+                <div class="detail-charger-card">
+
+
+                    <!-- =========================
+                         CHARGER ICON
+                    ========================== -->
+
+                    <div class="detail-charger-icon">
+
+                        <i class="bi bi-lightning-charge-fill"></i>
+
+                    </div>
+
+
+                    <!-- =========================
+                         CHARGER INFORMATION
+                    ========================== -->
+
+                    <div class="detail-charger-info">
+
+                        <h5>
+                            {{ charger.charger_number }}
+                        </h5>
+
+                        <p>
+
+                            {{ charger.charger_type }}
+
+                            <span>
+                                •
+                            </span>
+
+                            {{ charger.power_kw }} kW
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- =========================
+                         PRICE
+                    ========================== -->
+
+                    <div class="detail-charger-price">
+
+                        <span>
+                            Price
+                        </span>
+
+                        <strong>
+                            ₹{{ charger.price_per_kwh }}
+                        </strong>
+
+                        <small>
+                            / kWh
+                        </small>
+
+                    </div>
+
+
+                    <!-- =========================
+                         STATUS
+                    ========================== -->
+
+                    <div class="detail-charger-status">
+
+
+                        {% if charger.status == "AVAILABLE" %}
+
+                            <span class="charger-status available">
+
+                                <span></span>
+
+                                Available
+
+                            </span>
+
+
+                        {% elif charger.status == "OCCUPIED" %}
+
+                            <span class="charger-status occupied">
+
+                                <span></span>
+
+                                Occupied
+
+                            </span>
+
+
+                        {% elif charger.status == "MAINTENANCE" %}
+
+                            <span class="charger-status maintenance">
+
+                                <span></span>
+
+                                Maintenance
+
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="charger-status offline">
+
+                                <span></span>
+
+                                Offline
+
+                            </span>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                    <!-- =========================
+                         ACTION
+                    ========================== -->
+
+                    <div class="detail-charger-action">
+
+
+                        {% if charger.status == "AVAILABLE" and charger.is_active %}
+
+
+                            <a
+                                href="{% url 'book_charger' charger.id %}"
+                                class="book-charger-btn"
+                            >
+
+                                <span>
+                                    Book Charger
+                                </span>
+
+                                <i class="bi bi-arrow-right"></i>
+
+                            </a>
+
+
+                        {% else %}
+
+
+                            <button
+                                type="button"
+                                class="station-disabled-btn"
+                                disabled
+                            >
+
+                                Unavailable
+
+                            </button>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% empty %}
+
+
+                <!-- =========================
+                     NO CHARGERS
+                ========================== -->
+
+                <div class="empty-station-chargers">
+
+                    <i class="bi bi-lightning-charge"></i>
+
+                    <h5>
+                        No Chargers Available
+                    </h5>
+
+                    <p>
+                        This station currently has no registered chargers.
+                    </p>
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     PAGE-SPECIFIC STYLES
+========================================== -->
+
+<style>
+
+    /* -----------------------------------------
+       CHARGER ROW
+    ----------------------------------------- */
+
+    .detail-charger-card {
+
+        display: flex;
+        align-items: center;
+
+        gap: 18px;
+
+        min-height: 72px;
+
+        padding: 10px 14px;
+
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 10px;
+
+        margin-bottom: 8px;
+
+        transition: all 0.2s ease;
+
+    }
+
+
+    .detail-charger-card:hover {
+
+        border-color: #d1d5db;
+
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+
+    }
+
+
+    /* -----------------------------------------
+       CHARGER INFO
+    ----------------------------------------- */
+
+    .detail-charger-info {
+
+        flex: 1;
+
+        min-width: 160px;
+
+    }
+
+
+    .detail-charger-info h5 {
+
+        margin: 0 0 3px;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        color: #111827;
+
+    }
+
+
+    .detail-charger-info p {
+
+        margin: 0;
+
+        font-size: 11px;
+
+        color: #6b7280;
+
+    }
+
+
+    .detail-charger-info p span {
+
+        margin: 0 3px;
+
+    }
+
+
+    /* -----------------------------------------
+       PRICE
+    ----------------------------------------- */
+
+    .detail-charger-price {
+
+        width: 100px;
+
+        display: flex;
+
+        flex-direction: column;
+
+    }
+
+
+    .detail-charger-price span {
+
+        font-size: 9px;
+
+        color: #6b7280;
+
+        margin-bottom: 2px;
+
+    }
+
+
+    .detail-charger-price strong {
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        color: #111827;
+
+    }
+
+
+    .detail-charger-price small {
+
+        font-size: 9px;
+
+        color: #6b7280;
+
+    }
+
+
+    /* -----------------------------------------
+       STATUS
+    ----------------------------------------- */
+
+    .detail-charger-status {
+
+        width: 105px;
+
+        display: flex;
+
+        align-items: center;
+
+    }
+
+
+    .charger-status {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        padding: 6px 10px;
+
+        border-radius: 6px;
+
+        font-size: 10px;
+
+        font-weight: 600;
+
+        white-space: nowrap;
+
+    }
+
+
+    .charger-status > span {
+
+        width: 6px;
+
+        height: 6px;
+
+        border-radius: 50%;
+
+        display: inline-block;
+
+    }
+
+
+    /* Available */
+
+    .charger-status.available {
+
+        background: #dcfce7;
+
+        color: #15803d;
+
+    }
+
+
+    .charger-status.available > span {
+
+        background: #16a34a;
+
+    }
+
+
+    /* Occupied */
+
+    .charger-status.occupied {
+
+        background: #fef3c7;
+
+        color: #b45309;
+
+    }
+
+
+    .charger-status.occupied > span {
+
+        background: #f59e0b;
+
+    }
+
+
+    /* Maintenance */
+
+    .charger-status.maintenance {
+
+        background: #fee2e2;
+
+        color: #dc2626;
+
+    }
+
+
+    .charger-status.maintenance > span {
+
+        background: #ef4444;
+
+    }
+
+
+    /* Offline */
+
+    .charger-status.offline {
+
+        background: #f3f4f6;
+
+        color: #6b7280;
+
+    }
+
+
+    .charger-status.offline > span {
+
+        background: #9ca3af;
+
+    }
+
+
+    /* -----------------------------------------
+       ACTION AREA
+    ----------------------------------------- */
+
+    .detail-charger-action {
+
+        width: 130px;
+
+        display: flex;
+
+        justify-content: flex-end;
+
+        align-items: center;
+
+    }
+
+
+    /* -----------------------------------------
+       BOOK CHARGER BUTTON
+    ----------------------------------------- */
+
+    .book-charger-btn {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 7px;
+
+        min-width: 125px;
+
+        height: 38px;
+
+        padding: 0 15px;
+
+        background: #16a34a;
+
+        color: #ffffff !important;
+
+        border: none;
+
+        border-radius: 7px;
+
+        text-decoration: none !important;
+
+        font-size: 12px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: all 0.2s ease;
+
+    }
+
+
+    .book-charger-btn:hover {
+
+        background: #15803d;
+
+        color: #ffffff !important;
+
+        text-decoration: none !important;
+
+        transform: translateY(-1px);
+
+        box-shadow: 0 4px 10px rgba(22, 163, 74, 0.18);
+
+    }
+
+
+    .book-charger-btn i {
+
+        font-size: 13px;
+
+        transition: transform 0.2s ease;
+
+    }
+
+
+    .book-charger-btn:hover i {
+
+        transform: translateX(3px);
+
+    }
+
+
+    /* -----------------------------------------
+       UNAVAILABLE BUTTON
+    ----------------------------------------- */
+
+    .station-disabled-btn {
+
+        min-width: 125px;
+
+        height: 38px;
+
+        padding: 0 15px;
+
+        background: #f3f4f6;
+
+        color: #9ca3af;
+
+        border: none;
+
+        border-radius: 7px;
+
+        font-size: 12px;
+
+        font-weight: 500;
+
+        cursor: not-allowed;
+
+    }
+
+
+    /* -----------------------------------------
+       RESPONSIVE
+    ----------------------------------------- */
+
+    @media (max-width: 900px) {
+
+        .detail-charger-card {
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .detail-charger-info {
+
+            min-width: 140px;
+
+        }
+
+
+        .detail-charger-price {
+
+            width: 90px;
+
+        }
+
+
+        .detail-charger-status {
+
+            width: auto;
+
+        }
+
+
+        .detail-charger-action {
+
+            width: auto;
+
+            margin-left: auto;
+
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .detail-charger-card {
+
+            display: grid;
+
+            grid-template-columns: auto 1fr;
+
+            gap: 12px;
+
+            padding: 14px;
+
+        }
+
+
+        .detail-charger-info {
+
+            min-width: 0;
+
+        }
+
+
+        .detail-charger-price,
+
+        .detail-charger-status,
+
+        .detail-charger-action {
+
+            width: 100%;
+
+        }
+
+
+        .detail-charger-action {
+
+            justify-content: stretch;
+
+            grid-column: 1 / -1;
+
+        }
+
+
+        .book-charger-btn,
+
+        .station-disabled-btn {
+
+            width: 100%;
+
+        }
+
+    }
+
+</style>
+
+
+{% endblock %}

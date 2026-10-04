@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Find Stations | ChargeHub{% endblock %}
+
+{% block content %}
+
+<!-- ================= PAGE HEADER ================= -->
+
+<div class="stations-page-header">
+
+    <div>
+        <p class="dashboard-label">CHARGING NETWORK</p>
+
+        <h2>Find Charging Stations</h2>
+
+        <p class="dashboard-subtitle">
+            Find nearby EV charging stations and check charger availability.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- ================= SEARCH & FILTER ================= -->
+
+<div class="station-search-card">
+
+    <div class="station-search-box">
+
+        <i class="bi bi-search"></i>
+
+        <input
+            type="text"
+            id="stationSearch"
+            placeholder="Search station or city..."
+        >
+
+    </div>
+
+
+    <select id="chargerTypeFilter" class="station-filter">
+
+        <option value="">All Charger Types</option>
+
+        <option value="CCS2">CCS2</option>
+
+        <option value="TYPE2">Type 2</option>
+
+        <option value="CHADEMO">CHAdeMO</option>
+
+        <option value="TESLA">Tesla</option>
+
+    </select>
+
+
+    <select id="statusFilter" class="station-filter">
+
+        <option value="">All Status</option>
+
+        <option value="AVAILABLE">Available</option>
+
+        <option value="OCCUPIED">Occupied</option>
+
+        <option value="MAINTENANCE">Maintenance</option>
+
+        <option value="OFFLINE">Offline</option>
+
+    </select>
+
+</div>
+
+
+<!-- ================= STATION COUNT ================= -->
+
+<div class="stations-result-header">
+
+    <div>
+        <h5>Available Stations</h5>
+
+        <span>
+            {{ stations|length }} station{{ stations|length|pluralize }}
+            found
+        </span>
+    </div>
+
+</div>
+
+
+<!-- ================= STATIONS ================= -->
+
+<div class="stations-grid" id="stationsGrid">
+
+    {% for station in stations %}
+
+        <div
+            class="station-card"
+            data-name="{{ station.name|lower }}"
+            data-city="{{ station.city|lower }}"
+            data-types="{% for charger in station.chargers.all %}{{ charger.charger_type }} {% endfor %}"
+            data-statuses="{% for charger in station.chargers.all %}{{ charger.status }} {% endfor %}"
+        >
+
+            <!-- Station top -->
+
+            <div class="station-card-top">
+
+                <div class="station-main-icon">
+
+                    <i class="bi bi-ev-front-fill"></i>
+
+                </div>
+
+                <div class="station-status">
+
+                    {% if station.is_active %}
+
+                        <span class="status-dot"></span>
+                        Active
+
+                    {% else %}
+
+                        <span class="status-dot inactive"></span>
+                        Inactive
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Station information -->
+
+            <div class="station-card-content">
+
+                <h4>
+                    {{ station.name }}
+                </h4>
+
+                <p class="station-location">
+
+                    <i class="bi bi-geo-alt-fill"></i>
+
+                    {{ station.address }}, {{ station.city }}
+
+                </p>
+
+
+                <!-- Opening hours -->
+
+                <div class="station-hours">
+
+                    <i class="bi bi-clock"></i>
+
+                    {{ station.opening_time|time:"g:i A" }}
+                    -
+                    {{ station.closing_time|time:"g:i A" }}
+
+                </div>
+
+
+                <!-- Chargers -->
+
+                <div class="charger-list">
+
+                    {% for charger in station.chargers.all %}
+
+                        <div class="charger-row">
+
+                            <div class="charger-info">
+
+                                <span class="charger-type">
+                                    {{ charger.charger_type }}
+                                </span>
+
+                                <span class="charger-power">
+                                    {{ charger.power_kw }} kW
+                                </span>
+
+                            </div>
+
+
+                            <div class="charger-price">
+
+                                ₹{{ charger.price_per_kwh }}/kWh
+
+                            </div>
+
+
+                            {% if charger.status == "AVAILABLE" %}
+
+                                <span class="charger-status available">
+                                    Available
+                                </span>
+
+                            {% elif charger.status == "OCCUPIED" %}
+
+                                <span class="charger-status occupied">
+                                    Occupied
+                                </span>
+
+                            {% elif charger.status == "MAINTENANCE" %}
+
+                                <span class="charger-status maintenance">
+                                    Maintenance
+                                </span>
+
+                            {% else %}
+
+                                <span class="charger-status offline">
+                                    Offline
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% empty %}
+
+                        <div class="no-chargers">
+                            No chargers available
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- Actions -->
+
+                <div class="station-actions">
+
+                    <a href="{% url 'station_detail' station.id %}"
+                        class="station-details-btn"
+                    >
+                        View Details
+                    </a>
+
+                    <a  href="{% url 'station_detail' station.id %}" class="station-book-btn">
+                        Book Charger
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="empty-stations">
+
+            <i class="bi bi-ev-front"></i>
+
+            <h4>No Charging Stations</h4>
+
+            <p>
+                No active charging stations are available right now.
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+const searchInput = document.getElementById("stationSearch");
+
+const chargerTypeFilter =
+    document.getElementById("chargerTypeFilter");
+
+const statusFilter =
+    document.getElementById("statusFilter");
+
+const stationCards =
+    document.querySelectorAll(".station-card");
+
+
+function filterStations() {
+
+    const searchValue =
+        searchInput.value.toLowerCase().trim();
+
+    const typeValue =
+        chargerTypeFilter.value;
+
+    const statusValue =
+        statusFilter.value;
+
+
+    stationCards.forEach(card => {
+
+        const name =
+            card.dataset.name;
+
+        const city =
+            card.dataset.city;
+
+        const types =
+            card.dataset.types;
+
+        const statuses =
+            card.dataset.statuses;
+
+
+        const matchesSearch =
+            name.includes(searchValue) ||
+            city.includes(searchValue);
+
+
+        const matchesType =
+            !typeValue ||
+            types.includes(typeValue);
+
+
+        const matchesStatus =
+            !statusValue ||
+            statuses.includes(statusValue);
+
+
+        if (
+            matchesSearch &&
+            matchesType &&
+            matchesStatus
+        ) {
+
+            card.style.display = "";
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+searchInput.addEventListener(
+    "input",
+    filterStations
+);
+
+
+chargerTypeFilter.addEventListener(
+    "change",
+    filterStations
+);
+
+
+statusFilter.addEventListener(
+    "change",
+    filterStations
+);
+
+</script>
+
+{% endblock %}

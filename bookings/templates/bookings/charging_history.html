@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Charging History | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="history-page">
+
+    <!-- Header -->
+    <div class="history-header">
+
+        <div>
+            <p class="dashboard-label">
+                CHARGING
+            </p>
+
+            <h2>
+                Charging History
+            </h2>
+
+            <p class="dashboard-subtitle">
+                View your completed EV charging sessions.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- History Card -->
+    <div class="dashboard-card history-card">
+
+        <div class="card-heading">
+
+            <div>
+                <h5>
+                    Completed Sessions
+                </h5>
+
+                <p>
+                    Your previous charging activity
+                </p>
+            </div>
+
+            <div class="history-count">
+                {{ history|length }} Sessions
+            </div>
+
+        </div>
+
+
+        {% if history %}
+
+            <div class="history-list">
+
+                {% for booking in history %}
+
+                    <div class="history-item">
+
+                        <!-- Charger Icon -->
+                        <div class="history-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+
+
+                        <!-- Station Information -->
+                        <div class="history-station">
+
+                            <h6>
+                                {{ booking.station.name }}
+                            </h6>
+
+                            <span>
+                                <i class="bi bi-geo-alt"></i>
+                                {{ booking.station.city }},
+                                {{ booking.station.state }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- Charger -->
+                        <div class="history-detail">
+
+                            <span>
+                                Charger
+                            </span>
+
+                            <strong>
+                                {{ booking.charger.charger_number }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Vehicle -->
+                        <div class="history-detail">
+
+                            <span>
+                                Vehicle
+                            </span>
+
+                            <strong>
+                                {{ booking.vehicle.vehicle_name }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Date -->
+                        <div class="history-detail">
+
+                            <span>
+                                Date
+                            </span>
+
+                            <strong>
+                                {{ booking.booking_date|date:"d M Y" }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Energy -->
+                        <div class="history-detail">
+
+                            <span>
+                                Energy
+                            </span>
+
+                            <strong>
+                                {{ booking.estimated_energy }} kWh
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Amount -->
+                        <div class="history-detail">
+
+                            <span>
+                                Amount
+                            </span>
+
+                            <strong>
+                                ₹{{ booking.estimated_amount }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="history-status">
+
+                            <span>
+                                <i class="bi bi-check-circle-fill"></i>
+                                Completed
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <!-- Empty State -->
+
+            <div class="history-empty">
+
+                <div class="empty-history-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+
+                <h5>
+                    No Charging History
+                </h5>
+
+                <p>
+                    Your completed charging sessions will appear here.
+                </p>
+
+                <a
+                    href="{% url 'find_stations' %}"
+                    class="primary-btn"
+                >
+                    Find Charging Stations
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

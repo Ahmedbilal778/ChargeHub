@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Successful | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="payment-success-page">
+
+    <div class="payment-success-card">
+
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i class="bi bi-check-lg"></i>
+        </div>
+
+        <p class="success-label">
+            PAYMENT SUCCESSFUL
+        </p>
+
+        <h2>
+            Payment Completed!
+        </h2>
+
+        <p class="success-message">
+            Your payment has been successfully processed
+            and your charging booking is confirmed.
+        </p>
+
+
+        <!-- Amount -->
+        <div class="success-amount">
+            <span>Amount Paid</span>
+
+            <strong>
+                ₹{{ payment.amount }}
+            </strong>
+        </div>
+
+
+        <!-- Booking Details -->
+        <div class="success-details">
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-ev-front-fill"></i>
+                    Charging Station
+                </span>
+
+                <strong>
+                    {{ payment.booking.station.name }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Charger
+                </span>
+
+                <strong>
+                    {{ payment.booking.charger.charger_number }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-car-front-fill"></i>
+                    Vehicle
+                </span>
+
+                <strong>
+                    {{ payment.booking.vehicle.vehicle_name }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-calendar-event"></i>
+                    Date
+                </span>
+
+                <strong>
+                    {{ payment.booking.booking_date }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-clock"></i>
+                    Time
+                </span>
+
+                <strong>
+                    {{ payment.booking.start_time }}
+                    -
+                    {{ payment.booking.end_time }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-credit-card"></i>
+                    Payment Method
+                </span>
+
+                <strong>
+                    {{ payment.get_payment_method_display }}
+                </strong>
+            </div>
+
+
+            <div class="success-detail-row">
+                <span>
+                    <i class="bi bi-receipt"></i>
+                    Transaction ID
+                </span>
+
+                <strong>
+                    {{ payment.transaction_id }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <!-- Status -->
+        <div class="success-status">
+
+            <span class="status-dot"></span>
+
+            Booking Confirmed
+
+        </div>
+
+
+        <!-- Actions -->
+        <div class="success-actions">
+
+            <a
+                href="{% url 'my_bookings' %}"
+                class="success-primary-btn"
+            >
+                <i class="bi bi-calendar-check"></i>
+                View My Bookings
+            </a>
+
+
+            <a
+                href="{% url 'payments' %}"
+                class="success-secondary-btn"
+            >
+                <i class="bi bi-credit-card"></i>
+                View Payments
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

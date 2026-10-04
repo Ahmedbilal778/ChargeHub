@@ -1,0 +1,680 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}ChargeHub{% endblock %}
+    </title>
+
+
+    <!-- ================= BOOTSTRAP ================= -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- ================= BOOTSTRAP ICONS ================= -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+
+    <!-- ================= CHARGEHUB CSS ================= -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+
+    <style>
+        .profile-user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- ================= BRAND ================= -->
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+
+                <i class="bi bi-lightning-charge-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <h4>ChargeHub</h4>
+
+                <span>
+                    Smart EV Charging
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MAIN MENU
+        ================================================== -->
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-title">
+                MAIN MENU
+            </p>
+
+
+            <!-- Dashboard -->
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'dashboard' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-grid-1x2-fill"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+
+            <!-- Find Stations -->
+
+            <a
+                href="{% url 'find_stations' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'find_stations' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+                <span>
+                    Find Stations
+                </span>
+
+            </a>
+
+
+
+            <!-- My Bookings -->
+
+            <a
+                href="{% url 'my_bookings' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'my_bookings' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-calendar-check-fill"></i>
+
+                <span>
+                    My Bookings
+                </span>
+
+            </a>
+
+
+
+            <!-- My Vehicles -->
+
+            <a
+                href="{% url 'my_vehicles' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'my_vehicles' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-car-front-fill"></i>
+
+                <span>
+                    My Vehicles
+                </span>
+
+            </a>
+
+
+
+            <!-- Charging History -->
+
+            <a
+                href="{% url 'charging_history' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'charging_history' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-lightning-charge-fill"></i>
+
+                <span>
+                    Charging History
+                </span>
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ACCOUNT
+        ================================================== -->
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-title">
+                ACCOUNT
+            </p>
+
+
+
+            <!-- Payments -->
+
+            <a
+                href="{% url 'payments' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'payments' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-credit-card-fill"></i>
+
+                <span>
+                    Payments
+                </span>
+
+            </a>
+
+
+
+            <!-- Notifications -->
+
+            <a
+                href="{% url 'notifications' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'notifications' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-bell-fill"></i>
+
+                <span>
+                    Notifications
+                </span>
+
+                <span class="notification-badge">
+                    3
+                </span>
+
+            </a>
+
+
+
+            <!-- Profile -->
+
+            <a
+                href="{% url 'profile' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'profile' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-person-fill"></i>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+
+
+            <!-- Settings -->
+
+            <a
+                href="{% url 'settings' %}"
+                class="sidebar-link
+                {% if request.resolver_match.url_name == 'settings' %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-gear-fill"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+        </div>
+      <!-- =====================================================
+     DRIVE GREENER CARD
+====================================================== -->
+
+<div class="drive-greener-card">
+
+    <!-- Leaf Icon -->
+    <div class="drive-greener-icon">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19.5 3.5C13 3.8 6.1 6.4 5.2 12.2c-.4 2.7 1.3 5 4 5.4
+                     2.9.5 5.8-1.5 6.6-4.2.4-1.3.3-2.7-.2-4
+                     1.4-.8 2.7-1.8 3.9-3.2z"/>
+
+            <path d="M5.2 20.5c2.2-4.4 5.3-7.1 9.5-9.2"/>
+        </svg>
+
+    </div>
+
+
+    <!-- Text -->
+    <div class="drive-greener-content">
+
+        <h6>Drive Greener</h6>
+
+        <p>
+            Every charge makes a difference.
+        </p>
+
+        <a href="{% url 'dashboard' %}" class="drive-greener-btn">
+
+            Go Green
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </div>
+
+</div>
+
+        <!-- =================================================
+             SIDEBAR USER
+        ================================================== -->
+
+        <a
+            href="{% url 'profile' %}"
+            class="sidebar-user"
+        >
+
+
+            <!-- Avatar -->
+
+            <div class="user-avatar">
+
+                {% if user.profile_image %}
+
+                    <img
+                        src="{{ user.profile_image.url }}"
+                        alt="Profile photo"
+                        class="profile-user-image"
+                    >
+
+                {% else %}
+
+                    {% if user.first_name %}
+
+                        {{ user.first_name|first|upper }}
+
+                    {% else %}
+
+                        {{ user.username|first|upper }}
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+
+
+            <!-- User Info -->
+
+            <div class="user-info">
+
+                <strong>
+
+                    {% if user.get_full_name %}
+
+                        {{ user.get_full_name }}
+
+                    {% else %}
+
+                        {{ user.username }}
+
+                    {% endif %}
+
+                </strong>
+
+
+                <span>
+                    EV User
+                </span>
+
+            </div>
+
+
+
+            <i class="bi bi-chevron-right"></i>
+
+        </a>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="top-header">
+
+
+            <!-- ================= HEADER LEFT ================= -->
+
+            <div class="header-left">
+
+
+                <!-- Mobile Menu -->
+
+                <button
+                    class="mobile-menu-btn"
+                    type="button"
+                >
+
+                    <i class="bi bi-list"></i>
+
+                </button>
+
+
+
+                <!-- Greeting -->
+
+                <div>
+
+                    <p class="header-small">
+                        Welcome back
+                    </p>
+
+
+                    <h5>
+
+                        {% if user.first_name %}
+
+                            Hello,
+                            {{ user.first_name }}
+
+                        {% else %}
+
+                            Hello,
+                            {{ user.username }}
+
+                        {% endif %}
+
+                        👋
+
+                    </h5>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= HEADER RIGHT ================= -->
+
+            <div class="header-right">
+
+
+                <!-- =================================================
+                     SEARCH
+                ================================================== -->
+
+                <form
+                    class="header-search"
+                    method="GET"
+                    action="{% url 'find_stations' %}"
+                >
+
+                    <i class="bi bi-search"></i>
+
+
+                    <input
+                        type="search"
+                        name="q"
+                        placeholder="Search stations..."
+                        value="{{ request.GET.q|default:'' }}"
+                        autocomplete="off"
+                        aria-label="Search stations"
+                    >
+
+                </form>
+
+
+
+                <!-- =================================================
+                     THEME TOGGLE
+                ================================================== -->
+
+                <button
+                    class="theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-label="Toggle theme"
+                >
+
+                    <i
+                        class="bi bi-moon-fill"
+                        id="themeIcon"
+                    ></i>
+
+                </button>
+
+
+
+                <!-- =================================================
+                     NOTIFICATIONS
+                ================================================== -->
+
+                <a
+                    href="{% url 'notifications' %}"
+                    class="header-icon-btn"
+                    aria-label="Notifications"
+                >
+
+                    <i class="bi bi-bell"></i>
+
+                    <span
+                        class="header-notification-dot"
+                    ></span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                     PROFILE
+                ================================================== -->
+
+                <a
+                    href="{% url 'profile' %}"
+                    class="header-profile"
+                >
+
+
+                    <!-- Avatar -->
+
+                    <div class="profile-avatar">
+
+                        {% if user.profile_image %}
+
+                            <img
+                                src="{{ user.profile_image.url }}"
+                                alt="Profile photo"
+                                class="profile-user-image"
+                            >
+
+                        {% else %}
+
+                            {% if user.first_name %}
+
+                                {{ user.first_name|first|upper }}
+
+                            {% else %}
+
+                                {{ user.username|first|upper }}
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- Profile Text -->
+
+                    <div class="profile-text">
+
+                        <strong>
+
+                            {% if user.get_full_name %}
+
+                                {{ user.get_full_name }}
+
+                            {% else %}
+
+                                {{ user.username }}
+
+                            {% endif %}
+
+                        </strong>
+
+
+                        <span>
+                            EV Driver
+                        </span>
+
+                    </div>
+
+
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <section class="page-content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     BOOTSTRAP JS
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+
+<!-- =====================================================
+     CHARGEHUB JS
+====================================================== -->
+
+<script
+    src="{% static 'js/app.js' %}"
+></script>
+
+
+{% block extra_js %}
+
+{% endblock %}
+
+
+</body>
+
+</html>

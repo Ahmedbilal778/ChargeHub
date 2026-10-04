@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="profile-header">
+
+        <div>
+
+            <p class="profile-label">
+                ACCOUNT
+            </p>
+
+            <h2>
+                My Profile
+            </h2>
+
+            <p class="profile-subtitle">
+                Manage your ChargeHub account information.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'edit_profile' %}"
+            class="edit-profile-btn"
+        >
+
+            <i class="bi bi-pencil-fill"></i>
+
+            Edit Profile
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROFILE MAIN CARD
+    ====================================================== -->
+
+    <div class="profile-main-card">
+
+
+        <!-- USER SECTION -->
+
+        <div class="profile-user-section">
+
+            <div class="profile-avatar">
+
+                {{ request.user.username|first|upper }}
+
+            </div>
+
+
+            <div class="profile-user-info">
+
+                <h3>
+
+                    {% if request.user.get_full_name %}
+
+                        {{ request.user.get_full_name }}
+
+                    {% else %}
+
+                        {{ request.user.username }}
+
+                    {% endif %}
+
+                </h3>
+
+
+                <p>
+                    @{{ request.user.username }}
+                </p>
+
+
+                <span class="profile-status">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    Active Account
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PERSONAL INFORMATION
+        ================================================== -->
+
+        <div class="profile-info-section">
+
+            <div class="profile-section-title">
+
+                <i class="bi bi-person-vcard"></i>
+
+                <span>
+                    Personal Information
+                </span>
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+
+                <!-- Username -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Username
+                    </span>
+
+                    <span class="info-value">
+                        {{ request.user.username }}
+                    </span>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Email Address
+                    </span>
+
+                    <span class="info-value">
+
+                        {% if request.user.email %}
+
+                            {{ request.user.email }}
+
+                        {% else %}
+
+                            Not added
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <!-- First Name -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        First Name
+                    </span>
+
+                    <span class="info-value">
+
+                        {% if request.user.first_name %}
+
+                            {{ request.user.first_name }}
+
+                        {% else %}
+
+                            Not added
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <!-- Last Name -->
+
+                <div class="profile-info-item">
+
+                    <span class="info-label">
+                        Last Name
+                    </span>
+
+                    <span class="info-value">
+
+                        {% if request.user.last_name %}
+
+                            {{ request.user.last_name }}
+
+                        {% else %}
+
+                            Not added
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT STATISTICS
+    ====================================================== -->
+
+    <div class="profile-stats">
+
+
+        <!-- Vehicles -->
+
+        <div class="profile-stat-card">
+
+            <div class="profile-stat-icon">
+
+                <i class="bi bi-car-front-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="profile-stat-label">
+                    My Vehicles
+                </span>
+
+                <strong>
+                    {{ vehicles_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Bookings -->
+
+        <div class="profile-stat-card">
+
+            <div class="profile-stat-icon">
+
+                <i class="bi bi-calendar-check-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="profile-stat-label">
+                    Bookings
+                </span>
+
+                <strong>
+                    {{ bookings_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- Charging Sessions -->
+
+        <div class="profile-stat-card">
+
+            <div class="profile-stat-icon">
+
+                <i class="bi bi-lightning-charge-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="profile-stat-label">
+                    Charging Sessions
+                </span>
+
+                <strong>
+                    {{ charging_sessions }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECURITY
+    ====================================================== -->
+
+    <div class="profile-security-card">
+
+        <div>
+
+            <div class="profile-section-title">
+
+                <i class="bi bi-shield-lock-fill"></i>
+
+                <span>
+                    Account Security
+                </span>
+
+            </div>
+
+
+            <p>
+                Keep your account secure by using a strong password.
+            </p>
+
+        </div>
+
+
+        <a
+            href="#"
+            class="security-btn"
+        >
+
+            <i class="bi bi-key-fill"></i>
+
+            Change Password
+
+        </a>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

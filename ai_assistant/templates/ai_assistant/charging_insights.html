@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}AI Charging Insights | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="ai-insights-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="ai-insights-header">
+
+        <div>
+
+            <p class="ai-insights-label">
+                AI POWERED
+            </p>
+
+            <h2>
+                AI Charging Insights
+            </h2>
+
+            <p class="ai-insights-subtitle">
+                Personalized charging recommendations powered by Gemini AI.
+            </p>
+
+        </div>
+
+       <div style="display: flex; gap: 10px;">
+
+    <a
+        href="{% url 'charging_insights' %}?refresh=1"
+        class="security-btn"
+    >
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh AI
+    </a>
+
+    <a
+        href="{% url 'dashboard' %}"
+        class="security-btn"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Dashboard
+    </a>
+
+</div>
+
+    </div>
+
+
+    <!-- =====================================================
+         AI INTRO CARD
+    ====================================================== -->
+
+    <div class="ai-insight-hero">
+
+        <div class="ai-hero-icon">
+            <i class="bi bi-stars"></i>
+        </div>
+
+        <div class="ai-hero-content">
+
+            <span class="ai-hero-badge">
+                GEMINI AI
+            </span>
+
+            <h3>
+                Smart Charging Analysis
+            </h3>
+
+            <p>
+                Gemini analyzes your vehicle and charging activity
+                to provide personalized recommendations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         USER VEHICLE
+    ====================================================== -->
+
+    {% if vehicle %}
+
+    <div class="ai-vehicle-card">
+
+        <div class="ai-section-heading">
+
+            <div class="ai-section-icon">
+                <i class="bi bi-car-front-fill"></i>
+            </div>
+
+            <div>
+                <h4>
+                    Your Vehicle
+                </h4>
+
+                <p>
+                    Information used for this AI analysis.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="ai-vehicle-details">
+
+            <div class="ai-detail-item">
+
+                <span>
+                    Vehicle
+                </span>
+
+                <strong>
+                    {{ vehicle.vehicle_name }}
+                </strong>
+
+            </div>
+
+
+            <div class="ai-detail-item">
+
+                <span>
+                    Battery Capacity
+                </span>
+
+                <strong>
+                    {{ vehicle.battery_capacity }} kWh
+                </strong>
+
+            </div>
+
+
+            <div class="ai-detail-item">
+
+                <span>
+                    Current Battery
+                </span>
+
+                <strong>
+                    {{ vehicle.current_battery }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="ai-no-vehicle">
+
+        <i class="bi bi-car-front"></i>
+
+        <h4>
+            No Vehicle Added
+        </h4>
+
+        <p>
+            Add a vehicle to receive more personalized charging insights.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         GEMINI AI INSIGHTS
+    ====================================================== -->
+
+    <div class="ai-insights-grid">
+
+
+        <!-- =================================================
+             RECOMMENDED CHARGING
+        ================================================== -->
+
+        <div class="ai-insight-card ai-card-purple">
+
+            <div class="ai-card-top">
+
+                <div class="ai-card-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+
+                <span class="ai-card-badge">
+                    RECOMMENDED
+                </span>
+
+            </div>
+
+            <h4>
+                Recommended Charging
+            </h4>
+
+            <p>
+                {{ ai_insight.recommended_charging }}
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             BATTERY INSIGHT
+        ================================================== -->
+
+        <div class="ai-insight-card ai-card-green">
+
+            <div class="ai-card-top">
+
+                <div class="ai-card-icon">
+                    <i class="bi bi-battery-charging"></i>
+                </div>
+
+                <span class="ai-card-badge">
+                    BATTERY
+                </span>
+
+            </div>
+
+            <h4>
+                Battery Insight
+            </h4>
+
+            <p>
+                {{ ai_insight.battery_insight }}
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             COST INSIGHT
+        ================================================== -->
+
+        <div class="ai-insight-card ai-card-orange">
+
+            <div class="ai-card-top">
+
+                <div class="ai-card-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+                <span class="ai-card-badge">
+                    COST
+                </span>
+
+            </div>
+
+            <h4>
+                Cost Insight
+            </h4>
+
+            <p>
+                {{ ai_insight.cost_insight }}
+            </p>
+
+        </div>
+
+
+      <!-- =================================================
+     GREEN INSIGHT
+================================================== -->
+
+<div class="ai-insight-card ai-card-teal">
+
+    <div class="ai-card-top">
+
+        <div class="ai-card-icon">
+            <span class="bi bi-tree-fill"></span>
+        </div>
+
+        <span class="ai-card-badge">
+            ECO
+        </span>
+
+    </div>
+
+    <h4>
+        Green Insight
+    </h4>
+
+    <p>
+        {{ ai_insight.green_insight }}
+    </p>
+
+</div>
+
+   <!-- =====================================================
+     GEMINI AI ANALYSIS + SUMMARY
+====================================================== -->
+
+<div class="ai-analysis-card">
+
+    <!-- Header -->
+
+    <div class="ai-result-status">
+
+        <div class="ai-status-left">
+
+            <div class="ai-status-icon">
+                <i class="bi bi-stars"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    Gemini AI Analysis
+                </strong>
+
+                <span>
+                    Overall personalized summary
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="ai-status">
+
+            <span class="ai-status-dot"></span>
+
+            AI Generated
+
+        </div>
+
+    </div>
+
+
+    <!-- Overall Summary -->
+
+    <div class="ai-summary-content">
+
+        <span class="ai-summary-label">
+            OVERALL AI SUMMARY
+        </span>
+
+        <p>
+            {{ ai_insight.overall_summary }}
+        </p>
+
+    </div>
+
+</div>
+
+    <!-- =====================================================
+         FOOTER NOTE
+    ====================================================== -->
+
+    <div class="ai-disclaimer">
+
+        <i class="bi bi-info-circle"></i>
+
+        <span>
+            AI recommendations are generated from your available
+            ChargeHub data and are intended for informational purposes.
+        </span>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Book Charger | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ================= BACK ================= -->
+
+    <a
+        href="{% url 'find_stations' %}"
+        class="text-decoration-none text-muted d-inline-flex align-items-center gap-2 mb-4"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Stations
+    </a>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="mb-4">
+
+        <p class="text-success fw-semibold small mb-1">
+            CHARGER BOOKING
+        </p>
+
+        <h2 class="fw-bold mb-1">
+            Book Your Charger
+        </h2>
+
+        <p class="text-muted mb-0">
+            Select your vehicle and choose your charging time.
+        </p>
+
+    </div>
+
+
+    <!-- ================= MAIN GRID ================= -->
+
+    <div class="row g-4">
+
+
+        <!-- ================================================= -->
+        <!-- LEFT : CHARGER DETAILS -->
+        <!-- ================================================= -->
+
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+
+                    <!-- CHARGER HEADER -->
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+
+                        <div
+                            class="d-flex align-items-center justify-content-center rounded-3"
+                            style="
+                                width:58px;
+                                height:58px;
+                                background:#dcfce7;
+                                color:#16a34a;
+                                font-size:25px;
+                            "
+                        >
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+
+
+                        <div>
+
+                            <h4 class="fw-bold mb-1">
+                                {{ charger.charger_number }}
+                            </h4>
+
+                            <span class="text-muted">
+                                {{ charger.charger_type }}
+                                •
+                                {{ charger.power_kw }} kW
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div
+                        class="rounded-3 p-3 mb-4"
+                        style="background:#f0fdf4;"
+                    >
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <span
+                                class="rounded-circle bg-success"
+                                style="
+                                    width:8px;
+                                    height:8px;
+                                "
+                            ></span>
+
+                            <strong class="text-success">
+                                {{ charger.get_status_display }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DETAILS -->
+
+                    <div class="border-top pt-3">
+
+                        <!-- STATION -->
+
+                        <div class="d-flex justify-content-between py-3">
+
+                            <span class="text-muted">
+                                Charging Station
+                            </span>
+
+                            <strong class="text-end">
+                                {{ charger.station.name }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- CHARGER TYPE -->
+
+                        <div class="d-flex justify-content-between py-3 border-top">
+
+                            <span class="text-muted">
+                                Charger Type
+                            </span>
+
+                            <strong>
+                                {{ charger.charger_type }}
+                            </strong>
+
+                        </div>
+
+
+                        <!-- POWER -->
+
+                        <div class="d-flex justify-content-between py-3 border-top">
+
+                            <span class="text-muted">
+                                Charging Power
+                            </span>
+
+                            <strong>
+                                {{ charger.power_kw }} kW
+                            </strong>
+
+                        </div>
+
+
+                        <!-- PRICE -->
+
+                        <div class="d-flex justify-content-between py-3 border-top">
+
+                            <span class="text-muted">
+                                Price
+                            </span>
+
+                            <strong class="text-success">
+                                ₹{{ charger.price_per_kwh }} / kWh
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT : BOOKING FORM -->
+        <!-- ================================================= -->
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="mb-4">
+
+                        <h4 class="fw-bold mb-1">
+                            Booking Details
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Enter your charging session details.
+                        </p>
+
+                    </div>
+
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        <!-- ================= DATE ================= -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Booking Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="booking_date"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- ================= TIME ================= -->
+
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Start Time
+                                </label>
+
+                                <input
+                                    type="time"
+                                    name="start_time"
+                                    class="form-control"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    End Time
+                                </label>
+
+                                <input
+                                    type="time"
+                                    name="end_time"
+                                    class="form-control"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= VEHICLE ================= -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Vehicle
+                            </label>
+
+                            <select
+                                name="vehicle"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Vehicle
+                                </option>
+
+                                {% for vehicle in vehicles %}
+
+                                    <option value="{{ vehicle.id }}">
+                                        {{ vehicle.vehicle_name }}
+                                        -
+                                        {{ vehicle.vehicle_number }}
+                                    </option>
+
+                                {% empty %}
+
+                                    <option value="" disabled>
+                                        No vehicles added
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                            {% if not vehicles %}
+
+                                <small class="text-muted d-block mt-2">
+
+                                    <i class="bi bi-info-circle me-1"></i>
+
+                                    Add a vehicle before making a booking.
+
+                                </small>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- ================= NOTES ================= -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Notes
+                                <span class="text-muted fw-normal">
+                                    (Optional)
+                                </span>
+                            </label>
+
+                            <textarea
+                                name="notes"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Any additional notes..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- ================= SUMMARY ================= -->
+
+                        <div
+                            class="rounded-3 p-3 mb-4"
+                            style="background:#f8fafc;"
+                        >
+
+                            <div class="d-flex justify-content-between">
+
+                                <span class="text-muted">
+                                    Charger
+                                </span>
+
+                                <strong>
+                                    {{ charger.charger_number }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mt-2">
+
+                                <span class="text-muted">
+                                    Rate
+                                </span>
+
+                                <strong>
+                                    ₹{{ charger.price_per_kwh }} / kWh
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= SUBMIT ================= -->
+
+                        <button
+                            type="submit"
+                            class="btn btn-success w-100 py-2 fw-semibold"
+                        >
+
+                            Confirm Booking
+
+                            <i class="bi bi-arrow-right ms-1"></i>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

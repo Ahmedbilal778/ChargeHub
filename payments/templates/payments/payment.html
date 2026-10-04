@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Payment | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="payment-page">
+
+    <!-- Back -->
+    <a href="{% url 'find_stations' %}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Stations
+    </a>
+
+
+    <!-- Header -->
+    <div class="payment-header">
+
+        <div>
+            <p class="page-label">SECURE PAYMENT</p>
+
+            <h2>Complete Your Payment</h2>
+
+            <p>
+                Review your booking details and choose a payment method.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Error -->
+    {% if error %}
+
+        <div class="payment-error">
+            <i class="bi bi-exclamation-circle"></i>
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <div class="payment-layout">
+
+
+        <!-- ================================================= -->
+        <!-- LEFT: BOOKING SUMMARY -->
+        <!-- ================================================= -->
+
+        <div class="payment-card">
+
+            <div class="payment-card-header">
+
+                <div>
+                    <h4>Booking Summary</h4>
+                    <p>Your charging session details</p>
+                </div>
+
+                <div class="payment-summary-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+
+            </div>
+
+
+            <!-- Station -->
+
+            <div class="payment-station">
+
+                <div class="payment-station-icon">
+                    <i class="bi bi-ev-front-fill"></i>
+                </div>
+
+                <div>
+
+                    <span>Charging Station</span>
+
+                    <h5>
+                        {{ charger.station.name }}
+                    </h5>
+
+                    <small>
+                        <i class="bi bi-geo-alt"></i>
+                        {{ charger.station.city }},
+                        {{ charger.station.state }}
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Details -->
+
+            <div class="payment-details">
+
+                <div>
+                    <span>Charger</span>
+
+                    <strong>
+                        {{ charger.charger_number }}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Charger Type</span>
+
+                    <strong>
+                        {{ charger.get_charger_type_display }}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Power</span>
+
+                    <strong>
+                        {{ charger.power_kw }} kW
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Vehicle</span>
+
+                    <strong>
+                        {{ vehicle.vehicle_name }}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Date</span>
+
+                    <strong>
+                        {{ pending_booking.booking_date }}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Time</span>
+
+                    <strong>
+                        {{ pending_booking.start_time }}
+                        -
+                        {{ pending_booking.end_time }}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <!-- Energy -->
+
+            <div class="energy-summary">
+
+                <div>
+                    <span>Estimated Energy</span>
+
+                    <strong>
+                        {{ pending_booking.estimated_energy }} kWh
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Rate</span>
+
+                    <strong>
+                        ₹{{ charger.price_per_kwh }} / kWh
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT: PAYMENT -->
+        <!-- ================================================= -->
+
+        <div class="payment-card payment-form-card">
+
+            <div class="payment-card-header">
+
+                <div>
+                    <h4>Payment Method</h4>
+
+                    <p>
+                        Select how you want to pay.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <!-- UPI -->
+
+                <label class="payment-method">
+
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="UPI"
+                    >
+
+                    <div class="payment-method-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+
+                    <div class="payment-method-info">
+
+                        <strong>UPI</strong>
+
+                        <span>
+                            Pay using UPI
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </label>
+
+
+                <!-- Card -->
+
+                <label class="payment-method">
+
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="CARD"
+                    >
+
+                    <div class="payment-method-icon">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+
+                    <div class="payment-method-info">
+
+                        <strong>Card</strong>
+
+                        <span>
+                            Credit or Debit Card
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </label>
+
+
+                <!-- Wallet -->
+
+                <label class="payment-method">
+
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="WALLET"
+                    >
+
+                    <div class="payment-method-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+
+                    <div class="payment-method-info">
+
+                        <strong>Wallet</strong>
+
+                        <span>
+                            Pay using Wallet
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </label>
+
+
+                <!-- Net Banking -->
+
+                <label class="payment-method">
+
+                    <input
+                        type="radio"
+                        name="payment_method"
+                        value="NET_BANKING"
+                    >
+
+                    <div class="payment-method-icon">
+                        <i class="bi bi-bank"></i>
+                    </div>
+
+                    <div class="payment-method-info">
+
+                        <strong>Net Banking</strong>
+
+                        <span>
+                            Pay using Internet Banking
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </label>
+
+
+                <!-- Total -->
+
+                <div class="payment-total">
+
+                    <span>Total Amount</span>
+
+                    <strong>
+                        ₹{{ pending_booking.estimated_amount }}
+                    </strong>
+
+                </div>
+
+
+                <!-- Pay -->
+
+                <button
+                    type="submit"
+                    class="payment-submit-btn"
+                >
+
+                    <i class="bi bi-lock-fill"></i>
+
+                    Pay ₹{{ pending_booking.estimated_amount }}
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </button>
+
+
+                <p class="payment-secure">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    Secure demo payment • Your payment details are protected
+
+                </p>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

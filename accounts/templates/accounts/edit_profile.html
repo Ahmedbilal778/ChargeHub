@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="profile-header">
+
+        <div>
+
+            <p class="profile-label">
+                ACCOUNT
+            </p>
+
+            <h2>
+                Edit Profile
+            </h2>
+
+            <p class="profile-subtitle">
+                Update your ChargeHub account information.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'profile' %}"
+            class="security-btn"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back to Profile
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         EDIT PROFILE CARD
+    ====================================================== -->
+
+    <div class="profile-main-card">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="profile-info-section">
+
+
+                <!-- =================================================
+                     PROFILE PHOTO
+                ================================================== -->
+
+                <div class="profile-section-title">
+
+                    <i class="bi bi-camera"></i>
+
+                    <span>
+                        Profile Photo
+                    </span>
+
+                </div>
+
+
+                <div class="profile-photo-edit-area">
+
+                    <div class="profile-photo-preview">
+
+                        {% if request.user.profile_image %}
+
+                            <img
+                                src="{{ request.user.profile_image.url }}"
+                                alt="Profile Photo"
+                                id="profilePreview"
+                            >
+
+                        {% else %}
+
+                            <div
+                                class="profile-photo-letter"
+                                id="profileLetter"
+                            >
+                                {{ request.user.first_name|default:request.user.username|first|upper }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="profile-photo-controls">
+
+                        <label
+                            for="profile_image"
+                            class="profile-upload-btn"
+                        >
+
+                            <i class="bi bi-upload"></i>
+
+                            Choose Photo
+
+                        </label>
+
+
+                        <input
+                            type="file"
+                            name="profile_image"
+                            id="profile_image"
+                            accept="image/*"
+                            hidden
+                        >
+
+
+                        <p class="profile-photo-help">
+                            JPG, JPEG, PNG or WEBP
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PERSONAL INFORMATION
+                ================================================== -->
+
+                <div class="profile-section-title">
+
+                    <i class="bi bi-person-vcard"></i>
+
+                    <span>
+                        Personal Information
+                    </span>
+
+                </div>
+
+
+                <div class="profile-info-grid">
+
+
+                    <!-- First Name -->
+
+                    <div class="profile-info-item">
+
+                        <label class="info-label">
+                            First Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="first_name"
+                            value="{{ request.user.first_name }}"
+                            class="profile-input"
+                            placeholder="Enter first name"
+                        >
+
+                    </div>
+
+
+                    <!-- Last Name -->
+
+                    <div class="profile-info-item">
+
+                        <label class="info-label">
+                            Last Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="last_name"
+                            value="{{ request.user.last_name }}"
+                            class="profile-input"
+                            placeholder="Enter last name"
+                        >
+
+                    </div>
+
+
+                    <!-- Username -->
+
+                    <div class="profile-info-item">
+
+                        <label class="info-label">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ request.user.username }}"
+                            class="profile-input"
+                            disabled
+                        >
+
+                    </div>
+
+
+                    <!-- Email -->
+
+                    <div class="profile-info-item">
+
+                        <label class="info-label">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ request.user.email }}"
+                            class="profile-input"
+                            placeholder="Enter email address"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FORM ACTIONS
+                ================================================== -->
+
+                <div class="profile-form-actions">
+
+                    <a
+                        href="{% url 'profile' %}"
+                        class="security-btn"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="edit-profile-btn"
+                    >
+
+                        <i class="bi bi-check-lg"></i>
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     PROFILE PHOTO PREVIEW
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const imageInput =
+            document.getElementById(
+                "profile_image"
+            );
+
+        if (!imageInput) {
+            return;
+        }
+
+
+        imageInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function (event) {
+
+                        let preview =
+                            document.getElementById(
+                                "profilePreview"
+                            );
+
+                        const letter =
+                            document.getElementById(
+                                "profileLetter"
+                            );
+
+
+                        /*
+                         * If user does not already
+                         * have an image, create one.
+                         */
+
+                        if (!preview) {
+
+                            preview =
+                                document.createElement(
+                                    "img"
+                                );
+
+                            preview.id =
+                                "profilePreview";
+
+                            preview.alt =
+                                "Profile Photo";
+
+                            preview.className =
+                                "profile-preview-image";
+
+
+                            const previewBox =
+                                document.querySelector(
+                                    ".profile-photo-preview"
+                                );
+
+
+                            if (letter) {
+                                letter.remove();
+                            }
+
+
+                            previewBox.appendChild(
+                                preview
+                            );
+
+                        }
+
+
+                        preview.src =
+                            event.target.result;
+
+                    };
+
+
+                reader.readAsDataURL(file);
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

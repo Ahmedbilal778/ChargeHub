@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Book Charger | ChargeHub{% endblock %}
+
+{% block content %}
+
+<div class="booking-page">
+
+    <!-- Back -->
+    <a
+        href="{% url 'station_detail' charger.station.id %}"
+        class="back-link"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Station
+    </a>
+
+
+    <!-- Page Header -->
+    <div class="booking-header">
+
+        <div>
+            <span class="booking-label">CHARGER BOOKING</span>
+
+            <h1>Book Your Charger</h1>
+
+            <p>
+                Schedule your EV charging session at
+                <strong>{{ charger.station.name }}</strong>.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="booking-layout">
+
+        <!-- Charger Summary -->
+        <div class="booking-summary">
+
+            <div class="summary-header">
+
+                <div class="summary-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+
+                <div>
+                    <span>Charging Station</span>
+                    <h3>{{ charger.station.name }}</h3>
+                </div>
+
+            </div>
+
+
+            <div class="summary-details">
+
+                <div class="summary-item">
+                    <span>Charger</span>
+                    <strong>{{ charger.charger_number }}</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Type</span>
+                    <strong>{{ charger.get_charger_type_display }}</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Power</span>
+                    <strong>{{ charger.power_kw }} kW</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Price</span>
+                    <strong>₹{{ charger.price_per_kwh }} / kWh</strong>
+                </div>
+
+            </div>
+
+
+            <div class="booking-status">
+
+                <span class="status-dot"></span>
+
+                {{ charger.get_status_display }}
+
+            </div>
+
+        </div>
+
+
+        <!-- Booking Form -->
+        <div class="booking-form-card">
+
+            <div class="form-card-header">
+
+                <h2>Booking Details</h2>
+
+                <p>
+                    Select your preferred charging date and time.
+                </p>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <div class="form-group">
+
+                    <label for="booking_date">
+                        Booking Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="booking_date"
+                        name="booking_date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="start_time">
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="start_time"
+                            name="start_time"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="end_time">
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="end_time"
+                            name="end_time"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="estimated_energy">
+                        Estimated Energy (kWh)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="estimated_energy"
+                        name="estimated_energy"
+                        step="0.01"
+                        min="0"
+                        placeholder="e.g. 30"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="notes">
+                        Notes
+                        <span>(Optional)</span>
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        rows="3"
+                        placeholder="Add any additional notes..."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="confirm-booking-btn"
+                >
+                    Confirm Booking
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
