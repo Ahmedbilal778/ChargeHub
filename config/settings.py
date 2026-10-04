@@ -19,7 +19,11 @@ SECRET_KEY = 'django-insecure-sz8#_s+@t^aemyxlmy4p(uji8yr99p6ptlonlp0p)3w&$y5r6r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "chargehub-sg1w.onrender.com",
+]
 
 
 # Application definition
